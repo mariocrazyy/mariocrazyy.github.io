@@ -1,73 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>mario's cinemo</title>
+<title>mario's cinema</title>
 <style>
-body { margin: 0; background: black; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-#videoContainer { width: 80%; max-width: 1200px; margin-bottom: 20px; }
-video { width: 100%; height: auto; background: black; }
-#controls { display: flex; gap: 10px; }
-button { padding: 10px 20px; font-size: 16px; }
-input { width: 60%; padding: 10px; font-size: 16px; }
+body {
+  margin: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+iframe {
+  width: 90%;
+  height: 90%;
+  border: none;
+}
 </style>
 </head>
 <body>
 
-<h2 id="statusText">pls wait :3</h2>
+<iframe id="player"></iframe>
 
-<div id="videoContainer">
-    <video id="player" controls=false autoplay></video>
-</div>
-
-<div id="controls">
-    <input type="text" id="urlInput" placeholder="Paste video URL here (MP4/HLS)">
-    <button id="loadBtn">Load</button>
-    <button id="playBtn">Play ▶</button>
-    <button id="pauseBtn">Pause ⏸</button>
-    <button id="rewindBtn">⏪ 5s</button>
-    <button id="skipBtn">5s ⏩</button>
-</div>
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const socket = io('http://localhost:5000'); // Change to your Python server IP/port
-const player = document.getElementById('player');
-const statusText = document.getElementById('statusText');
+async function loadVideo() {
+  try {
+    const res = await fetch("https://mariocrazyy.github.io/video.json");
+    const data = await res.json();
 
-const urlInput = document.getElementById('urlInput');
-const loadBtn = document.getElementById('loadBtn');
-const playBtn = document.getElementById('playBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const rewindBtn = document.getElementById('rewindBtn');
-const skipBtn = document.getElementById('skipBtn');
+    if (data.url) {
+      document.getElementById("player").src = data.url;
+    }
+  } catch(e) {
+    console.log("error loading video");
+  }
+}
 
-// Host-only buttons
-loadBtn.addEventListener('click', () => {
-    const url = urlInput.value.trim();
-    if(!url) return alert('Enter a video URL!');
-    socket.emit('host_load', url);
-});
-
-playBtn.addEventListener('click', () => socket.emit('host_play'));
-pauseBtn.addEventListener('click', () => socket.emit('host_pause'));
-rewindBtn.addEventListener('click', () => socket.emit('host_seek', -5));
-skipBtn.addEventListener('click', () => socket.emit('host_seek', 5));
-
-// Receive commands from host (or self if host)
-socket.on('load_video', url => {
-    player.src = url;
-    player.load();
-    statusText.textContent = 'Video loaded';
-});
-socket.on('play_video', () => player.play());
-socket.on('pause_video', () => player.pause());
-socket.on('seek_video', offset => player.currentTime += offset);
-
-// Optional: sync status
-player.addEventListener('pause', () => { player.pause(); });
-player.addEventListener('seeked', () => { /* viewers cannot seek manually */ });
+// refresh every 2 seconds
+setInterval(loadVideo, 2000);
+loadVideo();
 </script>
 
 </body>

@@ -3,147 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Movie Night</title>
+<title>mario's cinema</title>
 <style>
-body {margin:0; font-family:sans-serif; background:#000; color:#fff; text-align:center;}
-#menu, #choose, #watch {max-width:900px; margin:auto; padding:20px;}
-input, button {padding:10px; font-size:1.2em; margin:5px;}
-iframe {width:100%; height:70vh; border:none; margin-top:20px;}
-#controls {margin-top:10px;}
-.hidden {display:none;}
+  body { margin:0; background:#000; color:#fff; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; }
+  #status { margin-bottom:10px; font-size:1.2em; }
+  iframe { width:80%; height:80%; border:none; }
 </style>
 </head>
 <body>
+<div id="status">pls wait for host</div>
+<iframe id="player" src="" allowfullscreen></iframe>
 
-<div id="menu">
-  <h1>🎬 Movie Night</h1>
-  <p>Enter password to join:</p>
-  <input type="text" id="pwInput" placeholder="Password">
-  <button onclick="join()">Join</button>
-  <p id="error" style="color:red;"></p>
-</div>
-
-<div id="choose" class="hidden">
-  <h2>Choose what to watch</h2>
-  <div id="hostControls" class="hidden">
-    <input type="text" id="videoUrl" placeholder="Paste VidKing embed link">
-    <div id="controls">
-      <button onclick="control('rewind')">⏪ 5s</button>
-      <button onclick="control('playpause')">▶/⏸</button>
-      <button onclick="control('skip')">5s ⏩</button>
-      <select id="quality" onchange="changeQuality(this.value)">
-        <option value="720">720p</option>
-        <option value="1440">1440p</option>
-      </select>
-      <button onclick="startVideo()">Start Video</button>
-    </div>
-  </div>
-  <div id="waiting" class="hidden">
-    <p>Waiting for host to start the video...</p>
-  </div>
-</div>
-
-<div id="watch" class="hidden">
-  <iframe id="vidFrame" src="" allowfullscreen></iframe>
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
 <script>
-const socket = io();
-let role = null;
-let hostPlaying = false;
-let videoTime = 0;
-let quality = '720';
-let videoUrl = '';
+const ws = new WebSocket("ws://192.168.1.8:8765"); // replace YOUR_HOST_IP with your PC's IP running host_gui.py
+const player = document.getElementById("player");
+const status = document.getElementById("status");
 
-// Replace with your passwords
-const HOST_PASSWORD = 'h0s4';
-const VIEWER_PASSWORD = 'vie21';
+let currentUrl = "";
+let lastAction = "";
 
-function join() {
-  const pw = document.getElementById('pwInput').value.trim();
-  if(pw === HOST_PASSWORD) role='host';
-  else if(pw === VIEWER_PASSWORD) role='viewer';
-  else {document.getElementById('error').textContent='❌ Wrong password'; return;}
+ws.onopen = () => {
+    status.textContent = "Connected to host.";
+};
 
-  document.getElementById('menu').classList.add('hidden');
-  document.getElementById('choose').classList.remove('hidden');
+ws.onmessage = (msg) => {
+    try {
+        const data = JSON.parse(msg.data);
+        if(data.url && data.url !== currentUrl){
+            currentUrl = data.url;
+            player.src = currentUrl;
+            status.textContent = "Host set the video. Loading...";
+        }
 
-  if(role==='host') {
-    document.getElementById('hostControls').classList.remove('hidden');
-  } else {
-    document.getElementById('waiting').classList.remove('hidden');
-  }
+        if(data.action !== lastAction){
+            lastAction = data.action;
+            handleAction(data);
+        }
+    } catch(e){
+        console.error(e);
+    }
+};
+
+function handleAction(data){
+    if(!player.src) return;
+    switch(data.action){
+        case "play":
+            status.textContent = "Playing";
+            postMessageToIframe("play");
+            break;
+        case "pause":
+            status.textContent = "Paused";
+            postMessageToIframe("pause");
+            break;
+        case "seek":
+            status.textContent = "Seeking to " + data.time + "s";
+            postMessageToIframe("seek", data.time);
+            break;
+        case "wait":
+            status.textContent = "Please wait for the host...";
+            break;
+    }
 }
 
-// HOST actions
-function startVideo() {
-  const url = document.getElementById('videoUrl').value.trim();
-  if(!url) return alert('Paste the VidKing embed link!');
-  videoUrl = url;
-  hostPlaying = true;
-  videoTime = 0;
-  updateVideo();
-  socket.emit('hostUpdate', {url:videoUrl, playing:hostPlaying, time:videoTime, quality});
-  document.getElementById('choose').classList.add('hidden');
-  document.getElementById('watch').classList.remove('hidden');
+// Since we cannot control VidKing iframe directly due to cross-origin, viewers manually follow instructions.
+function postMessageToIframe(action, time){
+    console.log("Action:", action, time || "");
+    // Here you can optionally overlay instructions
 }
-
-function control(cmd){
-  if(role!=='host') return;
-  if(cmd==='playpause') hostPlaying=!hostPlaying;
-  if(cmd==='rewind') videoTime=Math.max(0, videoTime-5);
-  if(cmd==='skip') videoTime+=5;
-  updateVideo();
-  socket.emit('hostUpdate', {url:videoUrl, playing:hostPlaying, time:videoTime, quality});
-}
-
-function changeQuality(q){
-  quality=q;
-  if(role==='host') control('playpause'); // refresh iframe for all
-}
-
-function updateVideo(){
-  const frame = document.getElementById('vidFrame');
-  frame.src = videoUrl + '#t=' + videoTime + '&quality=' + quality;
-}
-
-// Receive updates (for viewers)
-socket.on('updateState', (state)=>{
-  if(role==='viewer'){
-    videoUrl = state.url;
-    videoTime = state.time;
-    quality = state.quality;
-    hostPlaying = state.playing;
-    const frame = document.getElementById('vidFrame');
-    frame.src = videoUrl + '#t=' + videoTime + '&quality=' + quality;
-    document.getElementById('choose').classList.add('hidden');
-    document.getElementById('watch').classList.remove('hidden');
-  }
-});
-
-// Sync initial state
-socket.on('syncState', (state)=>{
-  if(role==='viewer' && state.url){
-    videoUrl = state.url;
-    videoTime = state.time;
-    quality = state.quality;
-    hostPlaying = state.playing;
-    const frame = document.getElementById('vidFrame');
-    frame.src = videoUrl + '#t=' + videoTime + '&quality=' + quality;
-    document.getElementById('choose').classList.add('hidden');
-    document.getElementById('watch').classList.remove('hidden');
-  }
-});
-
-// Keyboard shortcuts for host
-document.addEventListener('keydown', e=>{
-  if(role!=='host') return;
-  if(e.target.tagName==='INPUT') return;
-  if(e.code==='Space'){ e.preventDefault(); control('playpause'); }
-  if(e.code==='ArrowLeft') control('rewind');
-  if(e.code==='ArrowRight') control('skip');
-});
 </script>
 </body>
 </html>

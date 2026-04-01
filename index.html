@@ -21,23 +21,22 @@ iframe {
 <body>
 
 <iframe id="player"></iframe>
-
+  
 <script>
-async function loadVideo() {
-  try {
-    const res = await fetch("https://mariocrazyy.github.io/video.json");
-    const data = await res.json();
+let currentUrl = "";
 
-    if (data.url) {
-      document.getElementById("player").src = data.url;
-    }
-  } catch(e) {
-    console.log("error loading video");
+async function loadVideo() {
+  const res = await fetch("https://mariocrazyy.github.io/video.json?t=" + Date.now());
+  const data = await res.json();
+
+  if (data.url && data.url !== currentUrl) {
+    currentUrl = data.url;
+    document.getElementById("player").src = data.url;
+    console.log("New video loaded");
   }
 }
 
-// refresh every 2 seconds
-setInterval(loadVideo, 2000);
+setInterval(loadVideo, 3000);
 loadVideo();
 </script>
 

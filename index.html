@@ -3,73 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>mario's cinema</title>
+<title>mario's cinemo</title>
 <style>
-  body { margin:0; background:#000; color:#fff; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; }
-  #status { margin-bottom:10px; font-size:1.2em; }
-  iframe { width:80%; height:80%; border:none; }
+body { margin: 0; background: black; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+#videoContainer { width: 80%; max-width: 1200px; margin-bottom: 20px; }
+video { width: 100%; height: auto; background: black; }
+#controls { display: flex; gap: 10px; }
+button { padding: 10px 20px; font-size: 16px; }
+input { width: 60%; padding: 10px; font-size: 16px; }
 </style>
 </head>
 <body>
-<div id="status">pls wait for host :3</div>
-<iframe id="player" src="" allowfullscreen></iframe>
 
+<h2 id="statusText">pls wait :3</h2>
+
+<div id="videoContainer">
+    <video id="player" controls=false autoplay></video>
+</div>
+
+<div id="controls">
+    <input type="text" id="urlInput" placeholder="Paste video URL here (MP4/HLS)">
+    <button id="loadBtn">Load</button>
+    <button id="playBtn">Play ▶</button>
+    <button id="pauseBtn">Pause ⏸</button>
+    <button id="rewindBtn">⏪ 5s</button>
+    <button id="skipBtn">5s ⏩</button>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const ws = new WebSocket("ws://192.168.1.8:8765"); // replace YOUR_HOST_IP with your PC's IP running host_gui.py
-const player = document.getElementById("player");
-const status = document.getElementById("status");
+const socket = io('http://localhost:5000'); // Change to your Python server IP/port
+const player = document.getElementById('player');
+const statusText = document.getElementById('statusText');
 
-let currentUrl = "";
-let lastAction = "";
+const urlInput = document.getElementById('urlInput');
+const loadBtn = document.getElementById('loadBtn');
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const rewindBtn = document.getElementById('rewindBtn');
+const skipBtn = document.getElementById('skipBtn');
 
-ws.onopen = () => {
-    status.textContent = "Connected to host.";
-};
+// Host-only buttons
+loadBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if(!url) return alert('Enter a video URL!');
+    socket.emit('host_load', url);
+});
 
-ws.onmessage = (msg) => {
-    try {
-        const data = JSON.parse(msg.data);
-        if(data.url && data.url !== currentUrl){
-            currentUrl = data.url;
-            player.src = currentUrl;
-            status.textContent = "Host set the video. Loading...";
-        }
+playBtn.addEventListener('click', () => socket.emit('host_play'));
+pauseBtn.addEventListener('click', () => socket.emit('host_pause'));
+rewindBtn.addEventListener('click', () => socket.emit('host_seek', -5));
+skipBtn.addEventListener('click', () => socket.emit('host_seek', 5));
 
-        if(data.action !== lastAction){
-            lastAction = data.action;
-            handleAction(data);
-        }
-    } catch(e){
-        console.error(e);
-    }
-};
+// Receive commands from host (or self if host)
+socket.on('load_video', url => {
+    player.src = url;
+    player.load();
+    statusText.textContent = 'Video loaded';
+});
+socket.on('play_video', () => player.play());
+socket.on('pause_video', () => player.pause());
+socket.on('seek_video', offset => player.currentTime += offset);
 
-function handleAction(data){
-    if(!player.src) return;
-    switch(data.action){
-        case "play":
-            status.textContent = "Playing";
-            postMessageToIframe("play");
-            break;
-        case "pause":
-            status.textContent = "Paused";
-            postMessageToIframe("pause");
-            break;
-        case "seek":
-            status.textContent = "Seeking to " + data.time + "s";
-            postMessageToIframe("seek", data.time);
-            break;
-        case "wait":
-            status.textContent = "Please wait for the host...";
-            break;
-    }
-}
-
-// Since we cannot control VidKing iframe directly due to cross-origin, viewers manually follow instructions.
-function postMessageToIframe(action, time){
-    console.log("Action:", action, time || "");
-    // Here you can optionally overlay instructions
-}
+// Optional: sync status
+player.addEventListener('pause', () => { player.pause(); });
+player.addEventListener('seeked', () => { /* viewers cannot seek manually */ });
 </script>
+
 </body>
 </html>

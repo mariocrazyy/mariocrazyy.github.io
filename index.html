@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mario's Web</title>
+  <title></title>
 
   <style>
     body {
@@ -16,40 +16,37 @@
       font-family: Arial, sans-serif;
     }
 
-    .title {
-      font-size: 48px;
-      color: white;
-      letter-spacing: 2px;
-      border-right: 3px solid white;
-      padding-right: 10px;
-      white-space: nowrap;
-      overflow: hidden;
+    .message {
+      color: red;
+      font-size: 28px;
+      font-weight: bold;
+      border: 2px dashed red;
+      padding: 20px 30px;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
-  <div class="title" id="title"></div>
+  <div class="message">Nothing here (in red)</div>
 
   <script>
     const text = "mario's web";
-    const title = document.getElementById("title");
-
     let index = 0;
     let deleting = false;
 
-    function animate() {
+    function animateTitle() {
       if (!deleting) {
-        title.textContent = text.substring(0, index + 1);
+        document.title = text.substring(0, index + 1);
         index++;
 
         if (index === text.length) {
           deleting = true;
-          setTimeout(animate, 1000);
+          setTimeout(animateTitle, 800);
           return;
         }
       } else {
-        title.textContent = text.substring(0, index - 1);
+        document.title = text.substring(0, index - 1);
         index--;
 
         if (index === 0) {
@@ -57,10 +54,10 @@
         }
       }
 
-      setTimeout(animate, deleting ? 120 : 150);
+      setTimeout(animateTitle, deleting ? 120 : 150);
     }
 
-    animate();
+    animateTitle();
   </script>
 </body>
 </html>

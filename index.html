@@ -1,44 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>mario's cinema</title>
-<style>
-body {
-  margin: 0;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-iframe {
-  width: 90%;
-  height: 90%;
-  border: none;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mario's Web</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .title {
+      font-size: 48px;
+      color: white;
+      letter-spacing: 2px;
+      border-right: 3px solid white;
+      padding-right: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="title" id="title"></div>
 
-<iframe id="player"></iframe>
-  
-<script>
-let currentUrl = "";
+  <script>
+    const text = "mario's web";
+    const title = document.getElementById("title");
 
-async function loadVideo() {
-  const res = await fetch("https://mariocrazyy.github.io/video.json?t=" + Date.now());
-  const data = await res.json();
+    let index = 0;
+    let deleting = false;
 
-  if (data.url && data.url !== currentUrl) {
-    currentUrl = data.url;
-    document.getElementById("player").src = data.url;
-    console.log("New video loaded");
-  }
-}
+    function animate() {
+      if (!deleting) {
+        title.textContent = text.substring(0, index + 1);
+        index++;
 
-setInterval(loadVideo, 3000);
-loadVideo();
-</script>
+        if (index === text.length) {
+          deleting = true;
+          setTimeout(animate, 1000);
+          return;
+        }
+      } else {
+        title.textContent = text.substring(0, index - 1);
+        index--;
 
+        if (index === 0) {
+          deleting = false;
+        }
+      }
+
+      setTimeout(animate, deleting ? 120 : 150);
+    }
+
+    animate();
+  </script>
 </body>
 </html>

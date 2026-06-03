@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 - Page Lost | mario's net</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    font-family: Arial, sans-serif;
+    color: #fff;
+  }
+
+  /* Animated Shooting Stars Background */
+  #stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.9));
+    transform: rotate(45deg);
+    transform-origin: center;
+    animation: fall linear infinite;
+    opacity: 0;
+  }
+  
+  @keyframes fall {
+    0% {
+      transform: translate(0, 0) rotate(45deg);
+      opacity: 0;
+    }
+    10% { opacity: 1; }
+    85% { opacity: 1; }
+    100% {
+      transform: translate(-650px, 650px) rotate(45deg);
+      opacity: 0;
+    }
+  }
+
+  /* Main 404 container */
+  .box {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 30px;
+    padding: 40px;
+    border: 1px solid rgba(255,0,0,0.35);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+    min-width: 400px;
+  }
+
+  .error-code {
+    font-size: 120px;
+    font-weight: bold;
+    color: red;
+    text-shadow: 0 0 20px rgba(255,0,0,0.5);
+    margin: 0;
+    line-height: 1;
+  }
+
+  .glitch {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 10px 0;
+    position: relative;
+    color: #fff;
+  }
+
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch::before {
+    color: red;
+    z-index: -1;
+    animation: glitch-effect 0.3s infinite;
+  }
+
+  .glitch::after {
+    color: darkred;
+    z-index: -2;
+    animation: glitch-effect 0.3s infinite reverse;
+  }
+
+  @keyframes glitch-effect {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+  }
+
+  .message {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin: 10px 0;
+    max-width: 400px;
+  }
+
+  .path-display {
+    background: rgba(255,0,0,0.1);
+    border: 1px solid rgba(255,0,0,0.3);
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #ff6666;
+    word-break: break-all;
+    margin: 15px 0;
+    max-width: 500px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid red;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s, color .15s;
+  }
+
+  .btn:hover {
+    background: red;
+    color: #000;
+  }
+
+  .btn:hover img {
+    filter: invert(1);
+  }
+
+  .btn img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+  }
+
+  .suggestion {
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .suggestion a {
+    color: red;
+    text-decoration: none;
+  }
+
+  .suggestion a:hover {
+    text-decoration: underline;
+  }
+
+  hr {
+    border-color: rgba(255,0,0,0.2);
+    margin: 15px 0;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="box">
+  <div class="error-code">404</div>
+  <div class="glitch" data-text="PAGE NOT FOUND">PAGE NOT FOUND</div>
+  
+  <div class="message">
+    The page you're looking for doesn't exist, has been moved, or never existed in the first place.
+  </div>
+
+  <div class="path-display" id="badPath"></div>
+
+  <div class="button-group">
+    <a href="https://mariosnet.mooo.com" class="btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9L12 3L21 9V20H15V14H9V20H3V9Z" stroke="white" stroke-width="2" stroke-linejoin="round" fill="none"/>
+        <path d="M9 20V14H15V20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      Home
+    </a>
+  </div>
+
+  <hr>
+
+  <div class="suggestion">
+    💡 Maybe try <a href="/prxy/?url=https://google.com">searching</a> for what you wanted?<br>
+    Or check out my <a href="https://github.com/mariocrazyy">GitHub</a>.
+  </div>
+</div>
+
+<script>
+  /* ⭐ Star field background */
+  (function initStars(){
+    try {
+      const root = document.getElementById('stars');
+      if(!root) return;
+      const N = 85; 
+      for (let i = 0; i < N; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const left = Math.random() * 150 - 20;      
+        const top = Math.random() * 140 - 40;       
+        const duration = 4 + Math.random() * 5;     
+        const delay = Math.random() * -10; 
+        const length = 40 + Math.random() * 50;     
+        s.style.left = left + 'vw';
+        s.style.top = top + 'vh';
+        s.style.height = length + 'px';
+        s.style.animationDuration = duration + 's';
+        s.style.animationDelay = delay + 's';
+        s.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
+        root.appendChild(s);
+      }
+    } catch(err) {
+      console.log("Star generation runtime failure bypassed.");
+    }
+  })();
+
+  /* Show the actual broken URL path */
+  const badPath = document.getElementById('badPath');
+  if (badPath) {
+    badPath.innerText = location.pathname || '/something/that/doesnt/exist';
+  }
+</script>
+
+</body>
+</html>

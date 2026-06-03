@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>prxy - Proxy by mario_crazyy</title></head>
+<body>
+<input type="text" id="url" placeholder="https://example.com" size="50">
+<button onclick="fetchProxy()">Go</button>
+<iframe id="result" style="width:100%;height:80vh"></iframe>
+
+<script>
+async function fetchProxy() {
+  let target = document.getElementById('url').value;
+  let iframe = document.getElementById('result');
+  
+  try {
+    // Using corsproxy.io (free, public)
+    let proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(target);
+    iframe.src = proxyUrl;
+  } catch(e) {
+    iframe.srcdoc = 'Error: ' + e.message;
+  }
+}
+</script>
+</body>
+</html>

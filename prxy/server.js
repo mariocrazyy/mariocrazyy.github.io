@@ -8,7 +8,7 @@ const server = http.createServer((req, res) => {
     const query = url.parse(req.url, true).query;
     let target = query.url;
     
-    if (!target && req.url.startsWith('/')) {
+    if (!target && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(`
             <!DOCTYPE html>
@@ -18,6 +18,8 @@ const server = http.createServer((req, res) => {
                 <h2>Proxy Active</h2>
                 <input id="u" size="60" placeholder="https://example.com">
                 <button onclick="location.href='?url='+encodeURIComponent(u.value)">Go</button>
+                <iframe id="f" style="width:100%;height:70vh;margin-top:10px"></iframe>
+                <script>document.getElementById('f').src=location.href.split('?url=')[1]||''</script>
             </body>
             </html>
         `);
@@ -34,29 +36,30 @@ const server = http.createServer((req, res) => {
     const options = {
         hostname: parsedTarget.hostname,
         port: parsedTarget.port || (parsedTarget.protocol === 'https:' ? 443 : 80),
-        path: parsedTarget.path,
+        path: parsedTarget.path || '/',
         method: req.method,
         headers: {
             'User-Agent': 'Mozilla/5.0',
-            'Accept': '*/*'
+            'Accept': '*/*',
+            'Accept-Encoding': 'identity'
         }
     };
     
-    const proxyReq = (options.port === 443 ? https : http).request(options, (proxyRes) => {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    const protocol = options.port === 443 ? https : http;
+    const proxyReq = protocol.request(options, (proxyRes) => {
+        res.writeHead(proxyRes.statusCode, {
+            'Content-Type': proxyRes.headers['content-type'] || 'text/html',
+            'Access-Control-Allow-Origin': '*'
+        });
         proxyRes.pipe(res);
     });
     
     proxyReq.on('error', (err) => {
-        res.writeHead(500);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Proxy error: ' + err.message);
     });
     
-    if (req.method === 'POST') {
-        req.pipe(proxyReq);
-    } else {
-        proxyReq.end();
-    }
+    proxyReq.end();
 });
 
 server.listen(port, () => {

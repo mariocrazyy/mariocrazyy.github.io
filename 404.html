@@ -18,6 +18,7 @@
     color: #fff;
   }
 
+  /* Animated Shooting Stars Background */
   #stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
   
   .star {
@@ -44,6 +45,7 @@
     }
   }
 
+  /* Main 404 container */
   .box {
     position: relative;
     z-index: 1;
@@ -216,7 +218,7 @@
   <hr>
 
   <div class="suggestion">
-    💡 Maybe try <a href="https://google.com">searching</a> for what you wanted?<br>
+    💡 Maybe try <a href="/prxy/?url=https://google.com">searching</a> for what you wanted?<br>
     Or check out my <a href="https://github.com/mariocrazyy">GitHub</a>.
   </div>
 </div>
@@ -248,9 +250,23 @@
       console.log("Star generation runtime failure bypassed.");
     }
   })();
+  const redirects = {
+    '/rickroll': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    '/nevergonnagiveyouup': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    '/never-gonna-give-you-up': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    '/never-gonna-give-u-up': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    '/nevergonnagiveuup': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  };
 
+  /* Check if current path matches any redirect */
+  const currentPath = location.pathname;
+  if (redirects[currentPath]) {
+    location.href = redirects[currentPath];
+  }
+
+  /* Show the actual broken URL path (only if no redirect happened) */
   const badPath = document.getElementById('badPath');
-  if (badPath) {
+  if (badPath && !redirects[currentPath]) {
     badPath.innerText = location.pathname || '/something/that/doesnt/exist';
   }
 </script>

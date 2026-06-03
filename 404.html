@@ -18,7 +18,6 @@
     color: #fff;
   }
 
-  /* Animated Shooting Stars Background */
   #stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
   
   .star {
@@ -45,7 +44,6 @@
     }
   }
 
-  /* Main 404 container */
   .box {
     position: relative;
     z-index: 1;
@@ -218,7 +216,7 @@
   <hr>
 
   <div class="suggestion">
-    💡 Maybe try <a href="/prxy/?url=https://google.com">searching</a> for what you wanted?<br>
+    💡 Maybe try <a href="https://google.com">searching</a> for what you wanted?<br>
     Or check out my <a href="https://github.com/mariocrazyy">GitHub</a>.
   </div>
 </div>
@@ -251,7 +249,6 @@
     }
   })();
 
-  /* Show the actual broken URL path */
   const badPath = document.getElementById('badPath');
   if (badPath) {
     badPath.innerText = location.pathname || '/something/that/doesnt/exist';

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23000'/%3E%3Cpath d='M24 72V28h12l14 20 14-20h12v44H64V49L50 68 36 49v23z' fill='%23fff'/%3E%3C/svg%3E">
-<title>KaivoraOS — Desktop</title>
+<title>mario's net</title>
 <style>
 @font-face{font-family:Goldleaf;src:url("goldleaf-bold-font.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
 *{box-sizing:border-box}
@@ -946,7 +946,7 @@ function buildSettings(body) {
 }
 
 
-/* --- Kalu browser: DuckDuckGo search with pinned bookmarks --- */
+/* --- Kalu browser: in-page navigation + supported media embeds (GitHub Pages) --- */
 function buildKalu(body) {
   const root = mk('div', 'kalu-browser');
   const toolbar = mk('div', 'kalu-toolbar');
@@ -958,10 +958,9 @@ function buildKalu(body) {
   const address = mk('input', 'kalu-address');
   address.value = 'https://html.duckduckgo.com/html/';
   address.setAttribute('aria-label', 'Search DuckDuckGo or enter a web address');
-  address.placeholder = 'Search DuckDuckGo or enter a website';
+  address.placeholder = 'Search or enter a website';
   const go = mk('button', 'kalu-btn', 'Go');
-  const external = mk('button', 'kalu-btn', 'Open site ↗');
-  toolbar.append(brand, back, forward, reload, address, go, external);
+  toolbar.append(brand, back, forward, reload, address, go);
 
   const bookmarks = mk('div', 'kalu-bookmarks');
   const sites = [
@@ -970,79 +969,102 @@ function buildKalu(body) {
     { name: 'Spotify', url: 'https://open.spotify.com/', letter: 'S', color: '#16883e' },
     { name: 'TikTok', url: 'https://www.tiktok.com/', letter: '♪', color: '#15171b' }
   ];
-  const view = mk(window.kosRuntime?.electron ? 'webview' : 'iframe', 'kalu-view');
+  const view = mk('iframe', 'kalu-view');
   view.title = 'Kalu browser page';
-  if (view.tagName.toLowerCase() === 'iframe') view.referrerPolicy = 'strict-origin-when-cross-origin';
-  if (view.tagName.toLowerCase() === 'webview') {
-    view.setAttribute('allowpopups', '');
-    view.setAttribute('partition', 'persist:kalu');
-  }
-  view.src = 'https://html.duckduckgo.com/html/';
+  view.referrerPolicy = 'strict-origin-when-cross-origin';
+  view.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   const home = mk('div', 'kalu-home');
   const heading = document.createElement('h2'); heading.innerHTML = 'Search with <span>DuckDuckGo</span>';
-  const subtitle = mk('p', '', 'Search privately from Kalu. Your bookmarks are ready below.');
+  const subtitle = mk('p', '', 'Browse in this window. Media links are embedded when the site supports it.');
   const form = mk('form', 'kalu-searchform');
-  const query = mk('input'); query.placeholder = 'Search the web with DuckDuckGo…'; query.setAttribute('aria-label', 'DuckDuckGo search');
-  const searchBtn = mk('button', 'kalu-btn', 'Search'); searchBtn.type = 'submit'; searchBtn.style.background = '#282724'; searchBtn.style.color = '#f1eee6'; searchBtn.style.borderColor = '#282724';
+  const query = mk('input'); query.placeholder = 'Search the web…'; query.setAttribute('aria-label', 'DuckDuckGo search');
+  const searchBtn = mk('button', 'kalu-btn', 'Search'); searchBtn.type = 'submit';
   form.append(query, searchBtn); home.append(heading, subtitle, form);
-  const status = mk('div', 'kalu-status', 'Kalu · Enter a URL or search term. Some sites restrict embedding; use Open site ↗ when needed.');
-  root.append(toolbar, bookmarks, home, view, status); body.append(root);
+  const notice = mk('div', 'kalu-home');
+  notice.hidden = true;
+  const status = mk('div', 'kalu-status', 'Kalu · Search or enter a URL. Pages that prohibit embedding cannot be forced to load by GitHub Pages.');
+  root.append(toolbar, bookmarks, home, view, notice, status); body.append(root);
   view.hidden = true;
-  if (view.tagName.toLowerCase() === 'webview') {
-    view.addEventListener('did-start-loading', () => { status.textContent = 'Loading inside Kalu…'; });
-    view.addEventListener('did-finish-load', () => { status.textContent = 'Loaded inside Kalu'; });
-    view.addEventListener('did-fail-load', e => { if (e.errorCode !== -3) status.textContent = 'Could not load this page (' + e.errorCode + '). The site or network may be blocking access.'; });
-    view.addEventListener('new-window', e => { if (e.url && /^https?:/i.test(e.url)) navigate(e.url); });
-  }
-  let history = [], historyIndex = -1, currentUrl = 'https://html.duckduckgo.com/html/';
 
+  let history = [], historyIndex = -1, currentUrl = 'https://html.duckduckgo.com/html/';
   function normalize(raw) {
     const value = String(raw || '').trim();
     if (!value) return 'https://html.duckduckgo.com/html/';
-    // Never allow script or local-file schemes to be navigated to from the address bar.
     if (/^(javascript|data|file|vbscript):/i.test(value)) return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value);
     if (/^https?:\/\//i.test(value)) {
-      try { const parsed = new URL(value); return ['http:','https:'].includes(parsed.protocol) ? parsed.href : 'https://duckduckgo.com/?q=' + encodeURIComponent(value); }
+      try { const u = new URL(value); return ['http:','https:'].includes(u.protocol) ? u.href : 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value); }
       catch { return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value); }
     }
-    // Accept domains, localhost, IPv4 addresses, ports, and paths without requiring a scheme.
-    const looksLikeHost = !/\s/.test(value) && (/^(localhost|\d{1,3}(?:\.\d{1,3}){3})(:\d{1,5})?(\/.*)?$/i.test(value) || /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:\/[^\s]*)?$/i.test(value));
-    if (looksLikeHost) return 'https://' + value;
-    return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value);
+    const host = !/\s/.test(value) && (/^(localhost|\d{1,3}(?:\.\d{1,3}){3})(:\d{1,5})?(\/.*)?$/i.test(value) || /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:\/[^\s]*)?$/i.test(value));
+    return host ? 'https://' + value : 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value);
+  }
+  function internalNotice(title, message, link) {
+    view.hidden = true; home.hidden = true; notice.hidden = false; notice.replaceChildren();
+    const h = document.createElement('h2'); h.textContent = title;
+    const p = mk('p', '', message);
+    notice.append(h, p);
+    if (link) {
+      const a = document.createElement('a'); a.href = link; a.textContent = 'Copy link';
+      a.style.cssText = 'color:#d64a6c;cursor:pointer;text-decoration:underline';
+      a.addEventListener('click', async e => { e.preventDefault(); try { await navigator.clipboard.writeText(link); status.textContent = 'Link copied. Paste it into Kalu or another allowed page.'; } catch { address.value = link; status.textContent = 'Link is in the address bar.'; } });
+      notice.append(a);
+    }
+  }
+  function getDisplay(raw) {
+    let u;
+    try { u = new URL(raw); } catch { return { url: raw }; }
+    const host = u.hostname.toLowerCase().replace(/^www\./, '');
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtu.be' || host === 'youtube-nocookie.com') {
+      let id = u.searchParams.get('v');
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (host === 'youtu.be') id = parts[0];
+      if (['shorts','embed','live'].includes(parts[0])) id = parts[1];
+      if (id && /^[a-zA-Z0-9_-]{6,20}$/.test(id)) return { url: 'https://www.youtube-nocookie.com/embed/' + id, label: 'YouTube video embed' };
+      return { notice: true, title: 'YouTube', message: 'YouTube’s full homepage may refuse to load inside a GitHub Pages iframe. Try opening a direct video link; Kalu will convert it to an embedded player.', link: raw };
+    }
+    if (host === 'open.spotify.com') {
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts[0] === 'embed') return { url: raw };
+      if (['track','album','playlist','episode','show','artist'].includes(parts[0]) && parts[1]) return { url: 'https://open.spotify.com/embed/' + parts[0] + '/' + encodeURIComponent(parts[1]), label: 'Spotify player embed' };
+      return { notice: true, title: 'Spotify', message: 'The full Spotify website is not designed to run inside every iframe. Open a track, album, or playlist URL in Kalu to show its embedded player.', link: raw };
+    }
+    if (host === 'discord.com' || host === 'discordapp.com') {
+      return { notice: true, title: 'Discord cannot be embedded here', message: 'Discord blocks its full app from loading inside ordinary website iframes. GitHub Pages cannot remove that restriction, and Kalu will keep you on this page instead of opening a new tab.', link: raw };
+    }
+    if (host === 'tiktok.com') {
+      const match = u.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+      if (match) return { url: 'https://www.tiktok.com/embed/v2/' + match[1], label: 'TikTok video embed' };
+      return { notice: true, title: 'TikTok', message: 'TikTok’s full feed may block iframe embedding. Try a direct video URL; Kalu will attempt to load the video player inside this window.', link: raw };
+    }
+    return { url: raw };
   }
   function navigate(raw, push=true) {
     const url = normalize(raw); currentUrl = url; address.value = url;
-    home.hidden = true; view.hidden = false; view.src = url;
-    status.textContent = 'Loading inside Kalu: ' + url + ' · If it stays blank, that site may block iframe embedding.';
+    const display = getDisplay(url);
     if (push) { history = history.slice(0, historyIndex + 1); history.push(url); historyIndex = history.length - 1; }
-    back.disabled = historyIndex <= 0;
-    forward.disabled = historyIndex >= history.length - 1;
-  }
-  function openExternal(url=currentUrl) {
-    const safe = normalize(url);
-    if (!/^https?:\/\//i.test(safe)) return;
-    // Open directly from the user's click so browsers do not treat it as an unsolicited popup.
-    const tab = window.open(safe, '_blank', 'noopener,noreferrer');
-    if (!tab) status.textContent = 'Your browser blocked the new tab. Allow pop-ups for this page, then try again.';
-    else status.textContent = 'Opened in a new tab: ' + safe;
+    back.disabled = historyIndex <= 0; forward.disabled = historyIndex >= history.length - 1;
+    if (display.notice) {
+      internalNotice(display.title, display.message, display.link);
+      status.textContent = display.title + ' · staying inside Kalu';
+      return;
+    }
+    notice.hidden = true; home.hidden = true; view.hidden = false;
+    view.src = display.url;
+    status.textContent = (display.label ? display.label + ' · ' : 'Loading inside Kalu: ') + url;
   }
   go.onclick = () => navigate(address.value);
   address.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); navigate(address.value); } });
   form.addEventListener('submit', e => { e.preventDefault(); if (query.value.trim()) navigate('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query.value.trim())); });
-  external.onclick = () => openExternal();
   back.onclick = () => { if (historyIndex > 0) { historyIndex--; navigate(history[historyIndex], false); } };
   forward.onclick = () => { if (historyIndex < history.length - 1) { historyIndex++; navigate(history[historyIndex], false); } };
-  reload.onclick = () => { if (view.hidden) { view.hidden = false; home.hidden = true; } view.src = currentUrl; };
+  reload.onclick = () => { if (historyIndex < 0) navigate(currentUrl, false); else navigate(currentUrl, false); if (!view.hidden) view.src = view.src; };
   for (const site of sites) {
     const b = mk('button', 'kalu-bookmark');
     const icon = mk('span', 'kalu-siteicon', site.letter); icon.style.background = site.color;
-    b.append(icon, document.createTextNode(site.name));
-    b.title = 'Open ' + site.name;
-    b.onclick = () => { address.value = site.url; navigate(site.url); };
+    b.append(icon, document.createTextNode(site.name)); b.title = 'Open ' + site.name;
+    b.onclick = () => navigate(site.url);
     bookmarks.appendChild(b);
   }
-  // Make DuckDuckGo the browser's initial page while retaining a local home view.
-  address.addEventListener('focus', () => {});
   return null;
 }
 

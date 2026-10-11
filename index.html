@@ -4,1130 +4,1428 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
-<title>mario's net</title>
-
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23000'/%3E%3Cpath d='M24 72V28h12l14 20 14-20h12v44H64V49L50 68 36 49v23z' fill='%23fff'/%3E%3C/svg%3E">
+<title>KaivoraOS — Desktop</title>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-:root {
-  --red: #ff0000;
-  --red-border: rgba(255, 0, 0, 0.3);
-  --muted: rgba(255, 255, 255, 0.55);
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
-  background: #000;
-  font-family: Arial, sans-serif;
-  color: #fff;
-}
-
-/* Shooting stars */
-#stars {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.star {
-  position: absolute;
-  width: 2px;
-  height: 60px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(255, 255, 255, 0.9)
-  );
-  transform: rotate(45deg);
-  animation: fall linear infinite;
-  opacity: 0;
-}
-
-@keyframes fall {
-  0% {
-    transform: translate(0, 0) rotate(45deg);
-    opacity: 0;
-  }
-  10%, 85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-650px, 650px) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-/* Main container */
-.box {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  gap: 30px;
-  width: fit-content;
-  max-width: 100%;
-  padding: 28px;
-  border: 1px solid rgba(255, 0, 0, 0.35);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(5px);
-}
-
-/* Left panel */
-.left {
-  width: 280px;
-  flex-shrink: 0;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-
-.pfp {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid var(--red);
-  margin: 0 auto;
-}
-
-h1 {
-  font-size: 20px;
-  margin: 12px 0 4px;
-  color: var(--red);
-}
-
-.tag {
-  font-size: 13px;
-  opacity: 0.7;
-  margin: 0 0 4px;
-}
-
-/* Social links */
-.socials {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.socials a,
-.socials button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 0;
-  font-size: 12px;
-  color: #fff;
-  text-decoration: none;
-  border: 1px solid var(--red);
-  padding: 8px;
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s, color 0.15s;
-}
-
-.socials a:hover,
-.socials button:hover {
-  background: var(--red);
-  color: #000;
-}
-
-.socials a:hover img,
-.socials button:hover img {
-  filter: invert(1);
-}
-
-.socials img {
-  width: 14px;
-  height: 14px;
-}
-
-/* Artist contact */
-.artist-contact {
-  margin-top: 10px;
-  padding: 9px 10px;
-  border: 1px solid rgba(255, 0, 0, 0.25);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.35);
-  text-align: left;
-}
-
-.artist-contact .label {
-  font-size: 9px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 4px;
-}
-
-.artist-contact .name {
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.artist-contact a {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: var(--muted);
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-.artist-contact a:hover {
-  color: var(--red);
-}
-
-/* Discord status card */
-.discord-status-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid rgba(255, 0, 0, 0.25);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.35);
-  text-align: left;
-}
-
-.discord-avatar-container {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.discord-pfp {
-  display: block;
-  width: 38px;
-  height: 38px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.status-dot {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 11px;
-  height: 11px;
-  border: 2px solid #000;
-  border-radius: 50%;
-}
-
-.status-dot.online {
-  background: #23a55a;
-}
-
-.status-dot.idle {
-  background: #f0b232;
-}
-
-.status-dot.dnd {
-  background: #f23f43;
-}
-
-.status-dot.offline {
-  background: #80848e;
-}
-
-.discord-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: 4px;
-}
-
-.discord-name {
-  font-size: 12px;
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
-
-.discord-activity {
-  font-size: 10px;
-  color: var(--muted);
-  overflow-wrap: anywhere;
-  line-height: 1.4;
-}
-
-/* Right panel */
-.right {
-  width: 580px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.panel {
-  min-width: 0;
-  border: 1px solid var(--red-border);
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  padding: 12px;
-}
-
-.panel h3 {
-  margin: 0 0 10px;
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--red);
-}
-
-/* Language statistics */
-.lang-bar {
-  display: flex;
-  height: 8px;
-  width: 100%;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.lang-legend {
-  margin-top: 8px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px 12px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.lang-legend span {
-  overflow-wrap: anywhere;
-}
-
-.lang-legend .dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 5px;
-  vertical-align: middle;
-}
-
-/* Repositories */
-.repos {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  max-height: 240px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.repos::-webkit-scrollbar,
-.modal .list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.repos::-webkit-scrollbar-thumb,
-.modal .list::-webkit-scrollbar-thumb {
-  background: rgba(255, 0, 0, 0.4);
-  border-radius: 3px;
-}
-
-.repo {
-  min-width: 0;
-  border: 1px solid rgba(255, 0, 0, 0.2);
-  border-radius: 6px;
-  padding: 8px 10px;
-  transition: border-color 0.15s, background-color 0.15s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.repo:hover,
-.repo:focus-within {
-  border-color: rgba(255, 0, 0, 0.7);
-  background-color: rgba(255, 0, 0, 0.05);
-}
-
-.repo-title-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
-  min-width: 0;
-}
-
-.repo a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-
-.repo:hover a {
-  color: var(--red);
-}
-
-.archive-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #eab308;
-  flex-shrink: 0;
-}
-
-.archive-badge {
-  display: inline-block;
-  align-self: flex-start;
-  font-size: 9px;
-  font-weight: 600;
-  color: #eab308;
-  border: 1px solid rgba(234, 179, 8, 0.4);
-  background: rgba(234, 179, 8, 0.1);
-  padding: 1px 5px;
-  border-radius: 4px;
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.repo .meta {
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--muted);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.lang-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
-.muted {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-  grid-column: 1 / -1;
-  overflow-wrap: anywhere;
-}
-
-.bottom {
-  display: flex;
-  justify-content: flex-end;
-}
+@font-face{font-family:Goldleaf;src:url("goldleaf-bold-font.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+:root{--bg:#000;--panel:#0b0b0b;--panel2:#171717;--line:#2c2c2c;--text:#f2f2f2;--muted:#9a9a9a;--accent:#e5484d;--accent-ink:#000;--warn:#d8a35d;--ease:cubic-bezier(.2,.8,.2,1)}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;overflow-x:hidden;display:flex;justify-content:center;align-items:center;padding:24px;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);line-height:1.4}
+
+#stars{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.star{position:absolute;width:2px;height:60px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.85));transform:rotate(45deg);animation:fall linear infinite;opacity:0}
+@keyframes fall{0%{transform:translate(0,0) rotate(45deg);opacity:0}10%,85%{opacity:1}100%{transform:translate(-650px,650px) rotate(45deg);opacity:0}}
+
+.box{position:relative;z-index:1;display:flex;gap:28px;width:fit-content;max-width:100%;padding:28px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.left{width:280px;flex-shrink:0;text-align:center;display:flex;flex-direction:column}
+.pfp{width:100px;height:100px;object-fit:cover;border-radius:50%;border:2px solid var(--accent);margin:0 auto;cursor:pointer}
+h1{font-family:Goldleaf,system-ui,sans-serif;font-size:24px;font-weight:700;margin:12px 0 4px;letter-spacing:.15px}
+.tag{font-size:14px;color:var(--muted);margin:0 0 4px}
+.socials{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.socials a,.socials button,.repos-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;font-size:13px;color:var(--text);text-decoration:none;border:1px solid var(--line);padding:9px 12px;border-radius:8px;background:var(--panel2);cursor:pointer;font-family:inherit;transition:background .15s,color .15s,border-color .15s}
+.socials a:hover,.socials button:hover,.repos-btn:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.socials a:hover img,.socials button:hover img,.repos-btn:hover img{filter:invert(1)}
+.socials img,.repos-btn img{width:14px;height:14px}
+.right{width:580px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.panel{min-width:0;border:1px solid var(--line);background:rgba(0,0,0,.5);border-radius:10px;padding:14px}
+.panel h3{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--accent)}
+.lang-bar{display:flex;height:8px;width:100%;border-radius:999px;overflow:hidden;background:var(--line)}
+.lang-legend{margin-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px;font-size:12px;color:var(--text)}
+.lang-legend span{overflow-wrap:anywhere}
+.lang-legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.repos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:240px;overflow-y:auto;padding-right:4px}
+.repos::-webkit-scrollbar,.modal .list::-webkit-scrollbar,.term-body::-webkit-scrollbar{width:6px}
+.repos::-webkit-scrollbar-thumb,.modal .list::-webkit-scrollbar-thumb,.term-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.repo{min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 11px;transition:border-color .15s,background-color .15s;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.repo:hover,.repo:focus-within{border-color:var(--accent);background:var(--panel2);transform:translateY(-2px)}
+.repo-title-container{display:flex;align-items:center;gap:6px;margin-bottom:2px;min-width:0}
+.repo a{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.repo:hover a{color:var(--accent)}
+.archive-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn);flex-shrink:0}
+.archive-badge{display:inline-block;align-self:flex-start;font-size:11px;color:var(--warn);border:1px solid var(--line);padding:1px 6px;border-radius:4px;margin-top:4px}
+.repo .meta{margin-top:6px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lang-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.muted{font-size:12px;color:var(--muted);grid-column:1/-1;overflow-wrap:anywhere}
+.bottom{display:flex;justify-content:flex-end}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal-backdrop.open{display:flex}
+.modal{width:min(720px,100%);max-height:90vh;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column}
+.modal header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.modal h2{margin:0;font-size:17px;font-weight:600}
+.modal .close{flex-shrink:0;background:var(--panel2);border:1px solid var(--line);color:var(--text);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px}
+.modal .close:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.modal .list{overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:8px;padding-right:4px}
+
+.auth-fields{display:grid;gap:8px;margin-bottom:10px}
+.auth-fields input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-family:inherit;font-size:14px}
+.auth-fields input:focus{outline:2px solid var(--accent);outline-offset:0}
+.auth-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.auth-btns .muted{flex:1}
+.auth-msg{color:var(--warn);min-height:16px}
+#gameFrame{width:100%;height:62vh;border:0;border-radius:8px;background:var(--bg)}
+
+/* Terminal window: drag the title bar, resize from the bottom-right corner */
+.term{animation:term-in .22s var(--ease) both;position:fixed;top:80px;left:20px;width:min(560px,94vw);height:320px;min-width:260px;min-height:160px;max-width:100vw;max-height:100vh;display:flex;flex-direction:column;resize:both;overflow:hidden;z-index:20;background:#050505;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 36px rgba(0,0,0,.5)}
+.term-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;background:var(--panel2);border-bottom:1px solid var(--line);cursor:move;user-select:none;touch-action:none;font-size:13px;color:var(--muted)}
+.term-bar button{background:none;border:0;color:var(--muted);font-size:16px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:4px}
+.term-bar button:hover{background:var(--line);color:var(--text)}
+.term-body{flex:1;overflow-y:auto;padding:10px 12px;font:13px/1.5 ui-monospace,Consolas,"Courier New",monospace;color:#d6dbe0;cursor:text}
+.term-body div{white-space:pre-wrap;overflow-wrap:anywhere}
+.term-line{display:flex;gap:8px}
+.term-line span{color:var(--accent);white-space:nowrap}
+.term-line span.root{color:var(--warn)}
+.term-line input{flex:1;min-width:0;background:none;border:0;outline:0;color:inherit;font:inherit}
+.term-line input:disabled::placeholder{color:var(--muted)}
+.term-auth{flex-shrink:0;max-height:75%;overflow-y:auto;padding:12px;border-bottom:1px solid var(--line)}
+.term-auth .note{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--text)}
+.term-auth .auth-fields{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.term-auth .auth-btns{margin-bottom:6px}
+.term-auth .auth-msg{margin:0}
+.term.locked{height:min(400px,92vh)}
+
+
+.ps{color:var(--accent)}
+
+/* KaivoraOS — polished boot screen and desktop */
+#kos{position:fixed;inset:0;z-index:30;background:#080b12;color:#f5f7ff;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif}
+#kosBoot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:radial-gradient(ellipse at 50% 42%,rgba(229,72,77,.20),transparent 42%),linear-gradient(145deg,#111522,#07080d 65%)}
+.kos-logo{font-family:Goldleaf,"Segoe UI",system-ui,sans-serif;font-size:clamp(38px,6vw,64px);font-weight:700;letter-spacing:0;text-shadow:0 2px 24px rgba(213,170,83,.16);color:#d8b56d}
+.kos-logo b,.kos-start b{color:inherit;font:inherit}
+.kos-bar{width:min(240px,60vw);height:4px;background:rgba(255,255,255,.12);border-radius:20px;overflow:hidden}
+.kos-bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#e5484d,#ff9298);box-shadow:0 0 16px rgba(229,72,77,.65);animation:kosload 1.6s ease-out forwards}
+@keyframes kosload{to{width:100%}}
+#kosDesktop{position:absolute;inset:0;background-color:#10131b;background-position:center;background-size:cover;background-repeat:no-repeat}
+.kos-icons{position:absolute;top:14px;left:14px;display:grid;gap:10px;grid-auto-rows:84px}
+.kos-icon{width:84px;height:84px;background:rgba(12,14,21,.10);border:1px solid transparent;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:12px;cursor:pointer;font:inherit;font-size:12px;text-shadow:0 1px 4px #000;transition:background .18s,border-color .18s}
+.kos-icon span{font-size:30px;line-height:1}
+
+.kos-icon:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+.kos-icon:active,.kos-task:active,.kos-start:active{transform:scale(.97)}
+/* Vector app icons: no emoji glyphs */
+.kos-appmark{width:42px;height:42px;display:grid;place-items:center;border-radius:10px;box-shadow:none;flex-shrink:0}
+.kos-appmark svg{width:25px;height:25px;display:block}
+.kos-icon .kos-appmark{width:46px;height:46px;border-radius:14px}
+.kos-icon .kos-appmark svg{width:28px;height:28px}
+.kos-appmark.games{background:#343b50;color:#dce3f5}
+.kos-appmark.settings{background:#343a42;color:#e0e5eb}
+.kos-appmark.kalu{background:#a66b2c;color:#fff0d9}
+.kalu-browser{height:100%;min-height:0;display:flex;flex-direction:column;background:#f6f7f9;color:#17191d}
+.kalu-toolbar{display:flex;gap:7px;align-items:center;padding:10px;background:#fff;border-bottom:1px solid #e1e4e8;flex-wrap:wrap}
+.kalu-brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;color:#20242a;margin-right:5px}
+.kalu-brand .kos-appmark{width:32px;height:32px;border-radius:9px}
+.kalu-address{flex:1;min-width:130px;border:1px solid #d6dae0;background:#f5f6f8;border-radius:9px;padding:10px 12px;font:13px system-ui;color:#20242a;outline:none}
+.kalu-address:focus{border-color:#e58a2c;box-shadow:0 0 0 3px #e58a2c25}
+.kalu-btn{border:1px solid #d6dae0;background:#fff;border-radius:9px;padding:9px 12px;cursor:pointer;color:#252a31;font:600 12px system-ui}
+.kalu-btn:hover{background:#f0f2f5;transform:translateY(-1px)}
+.kalu-bookmarks{display:flex;gap:8px;flex-wrap:wrap;padding:10px;background:#fff;border-bottom:1px solid #e1e4e8}
+.kalu-bookmark{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #e1e4e8;background:#fff;border-radius:10px;cursor:pointer;font:600 12px system-ui;color:#262a30}
+.kalu-bookmark:hover{background:#f4f5f7;border-color:#c7ccd4}
+.kalu-siteicon{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;color:#fff;font:800 12px system-ui}
+.kalu-view{border:0;flex:1;min-height:180px;width:100%;background:#fff}
+.kalu-home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:30px;text-align:center;background:radial-gradient(ellipse at 50% 40%,#fff 0,#f6f7f9 68%)}
+.kalu-home h2{font-size:clamp(30px,5vw,48px);letter-spacing:-2px;margin:0;color:#242832}
+.kalu-home h2 span{color:#e58a2c}
+.kalu-home p{margin:0;color:#737b86;font-size:13px}
+.kalu-searchform{display:flex;width:min(560px,100%);gap:8px}
+.kalu-searchform input{flex:1;min-width:0;border:1px solid #d8dce2;background:#fff;border-radius:12px;padding:14px 16px;font:14px system-ui;outline:none;box-shadow:0 5px 20px #17191d0a}
+.kalu-searchform input:focus{border-color:#e58a2c}
+.kalu-status{font-size:11px;color:#7a818c;padding:6px 11px;background:#fff;border-top:1px solid #e1e4e8}
+@media(max-width:520px){.kalu-toolbar{gap:5px;padding:7px}.kalu-brand{font-size:15px}.kalu-btn{padding:8px}.kalu-bookmarks{gap:5px;padding:7px}.kalu-bookmark{padding:6px 8px}}
+
+#kosWindows{position:absolute;inset:0 0 68px 0;pointer-events:none}
+.kos-win{animation:window-in .2s var(--ease) both;pointer-events:auto;position:absolute;display:flex;flex-direction:column;background:rgba(17,19,27,.96);border:1px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.5);backdrop-filter:blur(18px)}
+.kos-win.max{left:0!important;top:0!important;width:100%!important;height:100%!important;border-radius:0}
+.kos-wbar{display:flex;align-items:center;gap:6px;padding:9px 12px;background:rgba(255,255,255,.045);border-bottom:1px solid rgba(255,255,255,.09);cursor:move;user-select:none;touch-action:none;font-size:13px}
+.kos-wtitle{flex:1}
+.kos-wbar button{background:none;border:0;color:#b6bac7;font-size:15px;line-height:1;cursor:pointer;padding:3px 7px;border-radius:5px}
+.kos-wbar button:hover{background:rgba(255,255,255,.12);color:#fff}
+.kos-wbody{flex:1;min-height:0;overflow:auto;position:relative}
+.kos-taskbar{position:absolute;left:12px;right:12px;bottom:10px;height:48px;display:flex;align-items:center;gap:10px;padding:0 12px;background:rgba(12,14,21,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.10);border-radius:10px;box-shadow:0 5px 18px rgba(0,0,0,.22)}
+.kos-start,.kos-task{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);color:#f5f7ff;border-radius:8px;padding:8px 13px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;transition:background .18s,border-color .18s}
+.kos-start{font-family:Goldleaf,"Segoe UI",system-ui,sans-serif;color:#d8b56d;font-weight:700;letter-spacing:0}
+.kos-start:hover,.kos-task:hover,.kos-task.active{background:rgba(229,72,77,.16);border-color:rgba(255,98,107,.65)}
+#kosTasks{display:flex;gap:6px;flex:1;overflow-x:auto;min-width:0}
+.kos-who,.kos-clock{font-size:12px;color:#c4c8d4;white-space:nowrap}
+.kos-menu{position:absolute;left:12px;bottom:68px;width:230px;background:rgba(17,19,27,.96);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:7px;box-shadow:0 18px 50px rgba(0,0,0,.45);backdrop-filter:blur(22px)}
+.kos-mi{display:block;width:100%;text-align:left;background:none;border:0;color:#f5f7ff;font:inherit;font-size:14px;padding:10px 12px;border-radius:8px;cursor:pointer}
+.kos-mi:hover{background:rgba(255,255,255,.09)}
+.kos-sep{height:1px;background:rgba(255,255,255,.12);margin:6px 4px}
+
+.kos-task .kos-appmark{display:inline-grid;vertical-align:middle;width:22px;height:22px;border-radius:6px;box-shadow:none}.kos-task .kos-appmark svg{width:15px;height:15px}.kos-wtitle .kos-appmark{width:23px;height:23px;border-radius:6px;box-shadow:none}.kos-wtitle .kos-appmark svg{width:15px;height:15px}.kos-mi .kos-appmark{width:28px;height:28px;border-radius:8px;box-shadow:none}.kos-mi .kos-appmark svg{width:17px;height:17px}
+/* Games library */
+.lib{display:flex;height:100%;min-height:0}
+.lib-side{width:230px;flex-shrink:0;display:flex;flex-direction:column;background:var(--bg);border-right:1px solid var(--line)}
+.lib-search{margin:10px;padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);font:inherit;font-size:13px}
+.lib-label{padding:2px 14px 6px;font-size:11px;letter-spacing:.5px;color:var(--muted)}
+.lib-list{flex:1;overflow-y:auto}
+.lib-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;background:none;border:0;color:var(--text);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.lib-item:hover{background:var(--panel2)}
+.lib-item.sel{background:var(--panel2);box-shadow:inset 3px 0 var(--accent)}
+.lib-tile{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.lib-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.lib-hero{height:170px;flex-shrink:0;display:flex;align-items:flex-end;padding:18px 22px;font-size:28px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.lib-bar{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:14px 22px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.lib-play{background:var(--accent);color:#000;border:0;border-radius:8px;padding:10px 26px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.lib-play:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.lib-stat{display:flex;flex-direction:column;font-size:11px;color:var(--muted)}
+.lib-stat b{font-size:13px;color:var(--text);font-weight:600}
+.lib-desc{padding:16px 22px;font-size:14px;color:var(--muted);overflow-y:auto}
+.lib-area{flex:1;min-height:0;display:flex;flex-direction:column}
+.lib-area iframe{flex:1;min-height:0;width:100%;border:0;background:#000}
+.lib-gname{font-weight:600;flex:1}
+
+/* Settings */
+.kos-settings{padding:16px 18px;display:grid;gap:10px;align-content:start;animation:content-in .22s var(--ease) both}
+.kos-settings h4{margin:8px 0 0;font-size:13px;color:var(--accent)}
+.kos-settings label{font-size:12px;color:var(--muted)}
+.kos-field{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--text);font:inherit;font-size:14px}
+.kos-field:focus,.lib-search:focus{outline:2px solid var(--accent);outline-offset:0}
+.kos-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.kos-prev{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:13px}
+.kos-prev img{width:16px;height:16px}
+.kos-settings input[type=file]{font-size:12px;color:var(--muted);max-width:100%}
+@media (max-width:640px){.lib{flex-direction:column}.lib-side{width:100%;max-height:36%;border-right:0;border-bottom:1px solid var(--line)}.lib-hero{height:110px;font-size:22px}}
+@media (max-width:1000px){body{align-items:flex-start;padding:20px}.box{flex-direction:column;width:min(580px,100%);gap:20px;padding:20px}.left,.right{width:100%}.right{min-height:360px}}
+@media (max-width:420px){body{padding:12px}.box{padding:14px}.repos{grid-template-columns:1fr}.lang-legend{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@keyframes window-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes term-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes content-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.star{animation:none;display:none}*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* KaivoraOS visual pass: one restrained design system, no fake-glass overload */
+:root{--kos-gold:#d8b56d;--kos-gold-soft:#a98b50;--kos-bg:#101113;--kos-panel:#18191c;--kos-line:#303136;--kos-muted:#a5a5a8;--kos-text:#eeeae1}
+#kos{background:var(--kos-bg);color:var(--kos-text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;isolation:isolate}
+#kosBoot{background:#101113;gap:22px}
+.kos-logo,.kos-start{font-family:Goldleaf,ui-serif,Georgia,serif;color:var(--kos-gold);font-weight:700;letter-spacing:.01em;text-shadow:none}
+.kos-logo{font-size:clamp(42px,6vw,66px)}
+.kos-bar{height:3px;background:#2a2a2a;border-radius:0;width:min(220px,58vw)}
+.kos-bar i{background:var(--kos-gold);box-shadow:none;animation:kosload 1.25s ease-out forwards}
+#kosDesktop{background-color:#121315;background-image:radial-gradient(ellipse at 72% 24%,rgba(216,181,109,.07),transparent 35%),linear-gradient(135deg,#151618,#101113 65%,#151515)}
+.kos-icons{top:18px;left:18px;gap:8px;grid-auto-rows:82px}
+.kos-icon{width:78px;height:78px;gap:8px;border-radius:8px;background:transparent;border:1px solid transparent;color:#e8e6e0;text-shadow:none;font-size:11px;transition:background .12s,border-color .12s}
+.kos-icon:hover{background:#ffffff0a;border-color:#ffffff14}
+.kos-icon:active,.kos-task:active,.kos-start:active{transform:none}
+.kos-appmark,.kos-icon .kos-appmark{width:40px;height:40px;border-radius:9px;box-shadow:none;border:1px solid #ffffff12}
+.kos-icon .kos-appmark{width:42px;height:42px}
+.kos-appmark.games{background:#252a31;color:#d9dce0}.kos-appmark.settings{background:#282a2d;color:#d9dce0}.kos-appmark.kalu{background:#6e5931;color:#f5e8c8}
+#kosWindows{inset:0 0 62px 0}
+.kos-win{background:#17181a;border:1px solid #3a3b3e;border-radius:8px;box-shadow:0 16px 42px #0007;backdrop-filter:none;animation:window-in .12s ease-out both}
+.kos-win.max{border-radius:0}
+.kos-wbar{padding:10px 12px;background:#202124;border-bottom:1px solid #343538;cursor:default;font-size:12px;color:#e7e4dc}
+.kos-wbar button{color:#b7b5ae;border-radius:4px}.kos-wbar button:hover{background:#38393c;color:#fff}
+.kos-wbody{background:#17181a}
+.kos-taskbar{left:12px;right:12px;bottom:10px;height:44px;gap:8px;padding:0 9px;background:#191a1c;border:1px solid #353639;border-radius:8px;box-shadow:0 4px 16px #0004;backdrop-filter:none}
+.kos-start,.kos-task{background:transparent;border:1px solid transparent;color:#e6e3dc;border-radius:6px;padding:7px 11px;font-size:12px;transition:background .12s,border-color .12s}
+.kos-start{color:var(--kos-gold);font-size:14px}
+.kos-start:hover,.kos-task:hover,.kos-task.active{background:#ffffff0b;border-color:#ffffff14}
+#kosTasks{gap:4px}.kos-who,.kos-clock{font-size:11px;color:#aaa9a5}
+.kos-menu{left:12px;bottom:62px;width:244px;background:#1a1b1d;border:1px solid #393a3d;border-radius:8px;padding:6px;box-shadow:0 12px 30px #0006;backdrop-filter:none}
+.kos-mi{font-size:13px;padding:10px;border-radius:5px;color:#e8e5de}.kos-mi:hover{background:#ffffff0b}
+.kos-sep{background:#353639}
+.kalu-browser{background:#f3f3f1;color:#20201e}
+.kalu-toolbar{gap:6px;padding:9px;background:#e9e8e4;border-bottom:1px solid #d4d2cc}
+.kalu-brand{font-size:15px;color:#25241f;font-weight:750}.kalu-brand .kos-appmark{width:28px;height:28px;border-radius:6px}
+.kalu-address{background:#f8f8f6;border:1px solid #d1d0ca;border-radius:6px;padding:9px 11px;color:#20201e;font-size:12px}
+.kalu-address:focus{border-color:#ad8d4f;box-shadow:0 0 0 2px #ad8d4f20}
+.kalu-btn{background:#f8f8f6;border:1px solid #d1d0ca;border-radius:6px;padding:8px 10px;color:#33312b;font-size:12px;font-weight:600;transition:background .1s}
+.kalu-btn:hover{background:#e5e3dc;transform:none}
+.kalu-bookmarks{gap:6px;padding:8px;background:#efeee9;border-bottom:1px solid #d4d2cc}
+.kalu-bookmark{padding:6px 9px;background:transparent;border:1px solid transparent;border-radius:6px;color:#33312b;font-weight:600;font-size:11px}
+.kalu-bookmark:hover{background:#e2e0d8;border-color:#d0cec6}
+.kalu-siteicon{width:21px;height:21px;border-radius:5px}
+.kalu-home{gap:15px;background:#f3f3f1}
+.kalu-home h2{font-size:clamp(28px,4vw,42px);letter-spacing:-1.4px;color:#25241f;font-weight:650}
+.kalu-home h2 span{color:#96783e}
+.kalu-home p{color:#77756f}
+.kalu-searchform input{border:1px solid #d4d2cc;border-radius:7px;padding:13px 14px;box-shadow:none}
+.kalu-searchform input:focus{border-color:#ad8d4f}
+.kalu-status{background:#e9e8e4;border-top:1px solid #d4d2cc;color:#69675f;font-size:10px}
+@media(max-width:700px){.kos-icons{top:10px;left:8px;grid-auto-rows:72px}.kos-icon{width:68px;height:68px}.kos-taskbar{left:6px;right:6px;bottom:6px;padding:0 5px;gap:4px}.kos-who{display:none}.kos-win{max-width:100vw;max-height:calc(100vh - 52px)}}
+@media(prefers-reduced-motion:reduce){.kos-win,.kos-logo,.kos-bar i{animation:none!important}}
+
+/* Final brand pass: Goldleaf wordmark + maroon/red palette throughout KaivoraOS and Kalu. */
+:root{--kos-gold:#8f1738;--kos-gold-soft:#641128;--kos-bg:#100b0e;--kos-panel:#1b1115;--kos-line:#3c2029;--kos-muted:#b6a5aa;--kos-text:#f3e9ec}
+@font-face{font-family:Goldleaf;src:url("goldleaf-bold-font.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+#kos{background:var(--kos-bg);color:var(--kos-text)}
+#kosBoot{background:radial-gradient(ellipse at 50% 42%,rgba(143,23,56,.22),transparent 44%),#100b0e}
+.kos-logo,.kos-start,#kos .kos-wtitle.brand-wordmark{font-family:Goldleaf,ui-serif,Georgia,serif!important;color:#b3234c!important;font-weight:700;letter-spacing:0;text-shadow:none}
+.kos-logo{font-size:clamp(42px,6vw,66px)}
+.kos-bar i{background:#b3234c;box-shadow:none}
+#kosDesktop{background-color:#100b0e;background-image:radial-gradient(ellipse at 72% 24%,rgba(143,23,56,.12),transparent 35%),linear-gradient(135deg,#1a1014,#100b0e 65%,#160d11)}
+.kos-appmark.kalu{background:#79152f;color:#ffe9ef}
+.kos-start:hover,.kos-task:hover,.kos-task.active{background:#8f173826;border-color:#b3234c55}
+.kos-mi:hover{background:#8f173826}
+.kalu-address:focus,.kalu-searchform input:focus{border-color:#8f1738;box-shadow:0 0 0 2px #8f17381c}
+.kalu-home h2 span{color:#8f1738}
+.kalu-btn:focus-visible,.kalu-bookmark:focus-visible{outline:2px solid #8f1738;outline-offset:2px}
+.kalu-searchform button{background:#68132b!important;border-color:#68132b!important;color:#fff!important}
+.kalu-status{color:#5f2638}
+
+
+/* KaivoraOS complete Goldleaf pass: every visible OS label/control uses the supplied font. */
+#kos, #kos *, #kos *::before, #kos *::after {
+  font-family: Goldleaf, ui-serif, Georgia, serif !important;
+  font-synthesis: none;
+}
+#kos input, #kos textarea, #kos select, #kos button { font-family: Goldleaf, ui-serif, Georgia, serif !important; }
+#kos .kos-logo, #kos .kos-start, #kos .kos-icon, #kos .kos-wtitle,
+#kos .kos-task, #kos .kos-mi, #kos .kos-wbar, #kos .kos-wbody,
+#kos .kos-settings, #kos .kalu-browser, #kos .kalu-browser * {
+  font-family: Goldleaf, ui-serif, Georgia, serif !important;
+}
+:root { --kos-gold:#b3234c; --kos-gold-soft:#78162f; }
+#kos .kalu-browser { --kalu-red:#8f1738; }
+#kos .kalu-toolbar, #kos .kalu-bookmarks, #kos .kalu-status { border-color:#d9a8b6; }
+#kos .kalu-brand, #kos .kalu-home h2 span { color:#8f1738 !important; }
+#kos .kalu-btn:focus-visible, #kos .kalu-bookmark:focus-visible,
+#kos .kalu-address:focus, #kos .kalu-searchform input:focus { outline-color:#b3234c; border-color:#b3234c; }
+#kos .kalu-searchform button { background:#8f1738 !important; border-color:#8f1738 !important; color:#fff !important; }
+#kos .kos-wbar { cursor:grab; }
+#kos .kos-wbar:active { cursor:grabbing; }
+#kos .kos-win.wiggling { will-change:transform; transform-origin:50% 18%; }
+#kos .kos-win.kos-wiggle-release { animation:kos-wiggle-release 520ms cubic-bezier(.2,.8,.2,1) both; transform-origin:50% 18%; }
+@keyframes kos-wiggle-release { 0%{transform:rotate(var(--release-angle,0deg)) scale(1.012,.992)} 22%{transform:rotate(calc(var(--release-angle,0deg) * -.72)) scale(.99,1.015)} 43%{transform:rotate(calc(var(--release-angle,0deg) * .42)) scale(1.006,.997)} 65%{transform:rotate(calc(var(--release-angle,0deg) * -.18)) scale(.998,1.003)} 82%{transform:rotate(calc(var(--release-angle,0deg) * .07)) scale(1.001,.999)} 100%{transform:rotate(0deg) scale(1,1)} }
+
+/* Live connection indicator for the KaivoraOS Cloudflare Worker */
+#kos .kalu-status{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#kos .kalu-backend-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;white-space:nowrap}
+#kos .kalu-backend-status::before{content:"";width:7px;height:7px;border-radius:50%;background:#a66;display:inline-block}
+#kos .kalu-backend-status.online::before{background:#238b57}
+#kos .kalu-backend-status.offline::before{background:#b3234c}
 
-.repos-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #fff;
-  text-decoration: none;
-  border: 1px solid var(--red);
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.repos-btn:hover {
-  background: var(--red);
-  color: #000;
-}
-
-.repos-btn:hover img {
-  filter: invert(1);
-}
-
-.repos-btn img {
-  width: 14px;
-  height: 14px;
-}
-
-/* Repository modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 10;
-}
-
-.modal-backdrop.open {
-  display: flex;
-}
-
-.modal {
-  width: min(720px, 100%);
-  max-height: 80vh;
-  overflow: hidden;
-  background: #000;
-  border: 1px solid rgba(255, 0, 0, 0.5);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.modal h2 {
-  margin: 0;
-  color: var(--red);
-  font-size: 16px;
-}
-
-.modal .close {
-  flex-shrink: 0;
-  background: transparent;
-  border: 1px solid var(--red);
-  color: #fff;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.modal .close:hover {
-  background: var(--red);
-  color: #000;
-}
-
-.modal .list {
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-  gap: 8px;
-  padding-right: 4px;
-}
-
-/* Responsive layout */
-@media (max-width: 1000px) {
-  body {
-    align-items: flex-start;
-    padding: 20px;
-  }
-
-  .box {
-    flex-direction: column;
-    width: min(580px, 100%);
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .left,
-  .right {
-    width: 100%;
-  }
-
-  .right {
-    min-height: 360px;
-  }
-}
-
-@media (max-width: 420px) {
-  body {
-    padding: 12px;
-  }
-
-  .box {
-    padding: 14px;
-  }
-
-  .repos {
-    grid-template-columns: 1fr;
-  }
-
-  .lang-legend {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .star {
-    animation: none;
-    display: none;
-  }
-
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition: none !important;
-  }
-}
 </style>
 </head>
-
 <body>
 
 <div id="stars" aria-hidden="true"></div>
 
 <main class="box">
   <section class="left">
-    <img
-      class="pfp"
-      src="https://github.com/mariocrazyy.png"
-      alt="mario_crazyy's profile picture"
-    >
-
+    <img class="pfp" src="https://github.com/mariocrazyy.png" alt="mario_crazyy's profile picture">
     <h1>mario_crazyy</h1>
     <p class="tag">welcome to my net</p>
-
     <div class="socials">
-      <a href="https://github.com/mariocrazyy"
-         target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.simpleicons.org/github/ffffff" alt="">
-        GitHub
-      </a>
-
-      <a href="https://steamcommunity.com/id/mario_crazyy/"
-         target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.simpleicons.org/steam/ffffff" alt="">
-        Steam
-      </a>
-
-      <button id="discordBtn" type="button">
-        <img src="https://cdn.simpleicons.org/discord/ffffff" alt="">
-        Discord
-      </button>
-
-      <a href="https://open.spotify.com/user/bc1qnf0vrs6ul63wxvp8jrtxgncu37fm9kzathfc4t"
-         target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.simpleicons.org/spotify/ffffff" alt="">
-        Spotify
-      </a>
-    </div>
-
-    <div class="artist-contact">
-      <div class="label">Official artist contact</div>
-      <div class="name">mario_crazyy</div>
-
-      <a href="mailto:mariostaykovv721@gmail.com">
-        mariostaykovv721@gmail.com
-      </a>
-
-      <a href="https://www.tiktok.com/@mario.crazyy"
-         target="_blank" rel="noopener noreferrer">
-        TikTok · @mario.crazyy
-      </a>
-
-      <a href="https://www.instagram.com/mario._.crazyy/"
-         target="_blank" rel="noopener noreferrer">
-        Instagram · @mario._.crazyy
-      </a>
-
-      <a href="https://x.com/mariocrazyyy"
-         target="_blank" rel="noopener noreferrer">
-        X · @mariocrazyyy
-      </a>
-    </div>
-
-    <div class="discord-status-card">
-      <div class="discord-avatar-container">
-        <img
-          id="discordPfp"
-          class="discord-pfp"
-          src="https://github.com/mariocrazyy.png"
-          alt="Discord avatar"
-        >
-        <div id="discordStatusDot"
-             class="status-dot offline"
-             aria-label="Offline"></div>
-      </div>
-
-      <div class="discord-info">
-        <span id="discordUsername" class="discord-name">
-          mario_crazyy
-        </span>
-        <span id="discordActivity" class="discord-activity">
-          Connecting status protocol...
-        </span>
-      </div>
+      <a href="https://github.com/mariocrazyy" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/github/ffffff" alt="">GitHub</a>
+      <a href="https://steamcommunity.com/id/mario_crazyy/" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/steam/ffffff" alt="">Steam</a>
+      <button id="discordBtn" type="button"><img src="https://cdn.simpleicons.org/discord/ffffff" alt="">Discord</button>
+      <a href="https://open.spotify.com/user/bc1qnf0vrs6ul63wxvp8jrtxgncu37fm9kzathfc4t" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/spotify/ffffff" alt="">Spotify</a>
     </div>
   </section>
 
   <section class="right">
     <div class="panel">
       <h3>Most used languages</h3>
-      <div id="langContent">
-        <p class="muted">Parsing language data...</p>
-      </div>
+      <div id="langContent"><p class="muted">Parsing language data...</p></div>
     </div>
-
-    <div class="panel"
-         style="flex:1; min-height:0; display:flex; flex-direction:column;">
+    <div class="panel" style="flex:1;min-height:0;display:flex;flex-direction:column;">
       <h3>Recent repos</h3>
-      <div class="repos" id="reposShort">
-        <p class="muted">Scanning repositories...</p>
-      </div>
+      <div class="repos" id="reposShort"><p class="muted">Scanning repositories...</p></div>
     </div>
-
     <div class="bottom">
-      <button class="repos-btn" id="openReposBtn" type="button">
-        <img src="https://cdn.simpleicons.org/github/ffffff" alt="">
-        GitHub Repos
-      </button>
+      <button class="repos-btn" id="openReposBtn" type="button"><img src="https://cdn.simpleicons.org/github/ffffff" alt="">GitHub Repos</button>
     </div>
   </section>
 </main>
 
-<div class="modal-backdrop" id="modal" role="dialog"
-     aria-modal="true" aria-labelledby="modalTitle">
+<!-- Repo modal -->
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
     <header>
       <h2 id="modalTitle">mariocrazyy's repositories</h2>
-      <button class="close" id="closeModal"
-              type="button" aria-label="Close">×</button>
+      <button class="close" id="closeModal" type="button" aria-label="Close">×</button>
     </header>
+    <div class="list" id="reposAll"><p class="muted">Loading repositories...</p></div>
+  </div>
+</div>
 
-    <div class="list" id="reposAll">
-      <p class="muted">Loading repositories...</p>
+<!-- Secret terminal window (press `) -->
+<div class="term" id="term" hidden>
+  <div class="term-bar" id="termBar">
+    <span id="termTitle">guest@net: ~</span>
+    <button type="button" id="termClose" aria-label="Close terminal">×</button>
+  </div>
+  <div class="term-auth" id="termAuth" hidden>
+    <p class="note">NOTE: No Email Needed</p>
+    <div class="auth-fields">
+      <input id="tAuthName" placeholder="name" maxlength="20" autocomplete="username">
+      <input id="tAuthPass" type="password" placeholder="password" autocomplete="current-password">
+    </div>
+    <div class="auth-btns">
+      <button class="repos-btn" id="tLoginBtn" type="button">Login</button>
+      <button class="repos-btn" id="tRegisterBtn" type="button">Register</button>
+      <button class="repos-btn" id="tGuestBtn" type="button">Play as guest</button>
+    </div>
+    <p class="muted auth-msg" id="tAuthMsg"></p>
+  </div>
+  <div class="term-body" id="termBody">
+    <div id="termOut"></div>
+    <div class="term-line"><span id="termPrompt">guest@net:~$</span><input id="termIn" autocomplete="off" spellcheck="false" aria-label="terminal"></div>
+  </div>
+</div>
+
+<!-- KaivoraOS -->
+<div id="kos" hidden>
+  <div id="kosBoot">
+    <div class="kos-logo">KaivoraOS</div>
+    <div class="kos-bar"><i></i></div>
+  </div>
+  <div id="kosDesktop" hidden>
+    <div class="kos-icons" id="kosIcons"></div>
+    <div id="kosWindows"></div>
+    <div class="kos-menu" id="kosMenu" hidden></div>
+    <div class="kos-taskbar">
+      <button type="button" class="kos-start" id="kosStart">KaivoraOS</button>
+      <div id="kosTasks"></div>
+      <span class="kos-who" id="kosUser"></span>
+      <span class="kos-clock" id="kosClock"></span>
     </div>
   </div>
 </div>
 
 <script>
-/* Configuration */
+/* ===== Configuration ===== */
 const GH_USER = 'mariocrazyy';
-const DISCORD_ID = '715560942635909202';
 const DISCORD_HANDLE = 'marioo.crazy';
+const SECRET_CODE = 'kaivoraos';
 
-const LANG_COLORS = {
-  JavaScript: '#f1e05a',
-  TypeScript: '#3178c6',
-  Python: '#3572A5',
-  HTML: '#e34c26',
-  CSS: '#563d7c',
-  Java: '#b07219',
-  'C++': '#f34b7d',
-  Lua: '#000080',
-  Shell: '#89e051',
-  Rust: '#dea584',
-  Go: '#00ADD8',
-  PHP: '#4F5D95',
-  C: '#555555',
-  CSharp: '#178600',
-  Kotlin: '#A97BFF',
-  Swift: '#F05138',
-  Ruby: '#701516'
-};
+// Add your games here. "file" is the path to each game's .html file.
+const GAMES = [
+  { id: 'game1', name: 'Game 1', file: 'games/game1.html' }
+  // { id: 'snake', name: 'Snake', file: 'games/snake.html' },
+];
 
-function langColor(name) {
-  return LANG_COLORS[name] || '#ef4444';
-}
+const LANG_COLORS = {JavaScript:'#f1e05a',TypeScript:'#3178c6',Python:'#3572A5',HTML:'#e34c26',CSS:'#563d7c',Java:'#b07219','C++':'#f34b7d',Lua:'#4a6cd4',Shell:'#89e051',Rust:'#dea584',Go:'#00ADD8',PHP:'#4F5D95',C:'#555555','C#':'#178600',Kotlin:'#A97BFF',Swift:'#F05138',Ruby:'#701516'};
+const langColor = n => LANG_COLORS[n] || '#8b98a5';
 
-/* Shooting stars */
-(function initStars() {
+/* ===== Shooting stars ===== */
+(function () {
   const root = document.getElementById('stars');
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    return;
-  }
-
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for (let i = 0; i < 85; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-
-    star.style.left = (Math.random() * 150 - 20) + 'vw';
-    star.style.top = (Math.random() * 140 - 40) + 'vh';
-    star.style.height = (40 + Math.random() * 50) + 'px';
-    star.style.animationDuration = (4 + Math.random() * 5) + 's';
-    star.style.animationDelay = (Math.random() * -10) + 's';
-
-    root.appendChild(star);
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = (Math.random() * 150 - 20) + 'vw';
+    s.style.top = (Math.random() * 140 - 40) + 'vh';
+    s.style.height = (40 + Math.random() * 50) + 'px';
+    s.style.animationDuration = (4 + Math.random() * 5) + 's';
+    s.style.animationDelay = (Math.random() * -10) + 's';
+    root.appendChild(s);
   }
 })();
 
-/* Discord handle copy */
+/* ===== Discord copy ===== */
 document.getElementById('discordBtn').addEventListener('click', async function () {
-  const button = this;
-  const originalContent = button.innerHTML;
-
-  try {
-    await navigator.clipboard.writeText(DISCORD_HANDLE);
-    button.textContent = 'Copied!';
-  } catch {
-    button.textContent = DISCORD_HANDLE;
-  }
-
-  setTimeout(() => {
-    button.innerHTML = originalContent;
-  }, 1500);
+  const b = this, old = b.innerHTML;
+  try { await navigator.clipboard.writeText(DISCORD_HANDLE); b.textContent = 'Copied!'; }
+  catch { b.textContent = DISCORD_HANDLE; }
+  setTimeout(() => { b.innerHTML = old; }, 1500);
 });
 
-/* Discord presence using Lanyard */
-async function updateDiscordStatus() {
-  const activityEl = document.getElementById('discordActivity');
-  const usernameEl = document.getElementById('discordUsername');
-  const statusDot = document.getElementById('discordStatusDot');
-  const avatarEl = document.getElementById('discordPfp');
-
+/* ===== GitHub data (cached for 1 hour to avoid API rate limits) ===== */
+async function cached(key, loader) {
   try {
-    const response = await fetch(
-      `https://api.lanyard.rest/v1/users/${DISCORD_ID}`
-    );
-
-    if (!response.ok) {
-      throw new Error('Lanyard request failed');
-    }
-
-    const json = await response.json();
-
-    if (!json.success || !json.data) {
-      throw new Error('No presence data');
-    }
-
-    const data = json.data;
-    const user = data.discord_user;
-
-    if (user) {
-      usernameEl.textContent = user.global_name || user.username || 'mario_crazyy';
-
-      if (user.avatar) {
-        const extension = user.avatar.startsWith('a_') ? 'gif' : 'png';
-
-        avatarEl.src =
-          `https://cdn.discordapp.com/avatars/${DISCORD_ID}/${user.avatar}.${extension}`;
-      } else if (user.id) {
-        avatarEl.src =
-          `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 6}.png`;
-      }
-    }
-
-    const status = data.discord_status || 'offline';
-    statusDot.className = `status-dot ${status}`;
-    statusDot.setAttribute('aria-label', status);
-
-    if (status === 'offline') {
-      activityEl.textContent = 'User currently offline';
-      return;
-    }
-
-    if (data.listening_to_spotify && data.spotify) {
-      const track = data.spotify.song || 'Music track';
-      const artist = data.spotify.artist
-        ? data.spotify.artist.split(';')[0]
-        : 'Unknown artist';
-
-      activityEl.textContent = `Listening to ${track} - ${artist}`;
-      return;
-    }
-
-    const activities = data.activities || [];
-
-    const customStatus = activities.find(activity => activity.type === 4);
-    const gameStatus = activities.find(
-      activity => activity.type === 0 || activity.type === 2
-    );
-
-    if (customStatus && customStatus.state) {
-      activityEl.textContent = customStatus.state;
-    } else if (gameStatus && gameStatus.name) {
-      activityEl.textContent = `Playing ${gameStatus.name}`;
-    } else {
-      activityEl.textContent = 'Currently not doing anything';
-    }
-  } catch (error) {
-    activityEl.textContent = 'Presence data unavailable';
+    const c = JSON.parse(localStorage.getItem(key));
+    if (c && Date.now() - c.t < 3600000) return c.v;
+  } catch {}
+  try {
+    const v = await loader();
+    try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), v })); } catch {}
+    return v;
+  } catch (err) {
+    try { const c = JSON.parse(localStorage.getItem(key)); if (c) return c.v; } catch {}
+    throw err;
   }
 }
 
-/* GitHub repository data */
 async function fetchRepos() {
-  const response = await fetch(
-    `https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`
-  );
+  const repos = await cached('mn_repos', async () => {
+    const r = await fetch(`https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`);
+    if (!r.ok) throw new Error('GitHub request failed: ' + r.status);
+    return r.json();
+  });
+  return repos.filter(r => !['mariocrazyy.github.io', 'mariocrazyy'].includes(r.name.toLowerCase()));
+}
 
-  if (!response.ok) {
-    throw new Error(`GitHub request failed: ${response.status}`);
-  }
-
-  const repos = await response.json();
-
-  return repos.filter(repo => {
-    const name = repo.name.toLowerCase();
-
-    return name !== 'mariocrazyy.github.io' &&
-           name !== 'mariocrazyy';
+async function fetchLanguages(repos) {
+  return cached('mn_langs', async () => {
+    const totals = {};
+    const results = await Promise.allSettled(
+      repos.filter(r => !r.fork).map(async r => {
+        const res = await fetch(r.languages_url);
+        return res.ok ? res.json() : {};
+      })
+    );
+    for (const res of results) {
+      if (res.status !== 'fulfilled') continue;
+      for (const [l, b] of Object.entries(res.value)) totals[l] = (totals[l] || 0) + b;
+    }
+    return totals;
   });
 }
 
-/* Aggregate language statistics */
-async function fetchLanguages(repos) {
-  const ownRepos = repos.filter(repo => !repo.fork);
-  const totals = {};
-
-  const results = await Promise.allSettled(
-    ownRepos.map(async repo => {
-      const response = await fetch(repo.languages_url);
-
-      if (!response.ok) {
-        return {};
-      }
-
-      return response.json();
-    })
-  );
-
-  for (const result of results) {
-    if (result.status !== 'fulfilled') continue;
-
-    for (const [language, bytes] of Object.entries(result.value)) {
-      totals[language] = (totals[language] || 0) + bytes;
-    }
-  }
-
-  return totals;
+function note(text) {
+  const p = document.createElement('p');
+  p.className = 'muted';
+  p.textContent = text;
+  return p;
 }
 
-/* Render language statistics */
 function renderLanguages(totals) {
-  const container = document.getElementById('langContent');
+  const c = document.getElementById('langContent');
+  const total = Object.values(totals).reduce((s, b) => s + b, 0);
+  if (!total) return c.replaceChildren(note('No language data available.'));
 
-  const total = Object.values(totals).reduce(
-    (sum, bytes) => sum + bytes, 0
-  );
+  const top = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([name, bytes]) => ({ name, pct: bytes / total * 100 }));
+  const bar = document.createElement('div'); bar.className = 'lang-bar';
+  const legend = document.createElement('div'); legend.className = 'lang-legend';
 
-  if (!total) {
-    container.replaceChildren();
-
-    const message = document.createElement('p');
-    message.className = 'muted';
-    message.textContent = 'No language data available.';
-    container.appendChild(message);
-
-    return;
-  }
-
-  const top = Object.entries(totals)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([name, bytes]) => ({
-      name,
-      pct: (bytes / total) * 100
-    }));
-
-  const bar = document.createElement('div');
-  bar.className = 'lang-bar';
-
-  const legend = document.createElement('div');
-  legend.className = 'lang-legend';
-
-  for (const language of top) {
-    const segment = document.createElement('div');
-    segment.title = `${language.name}: ${language.pct.toFixed(1)}%`;
-    segment.style.width = `${language.pct}%`;
-    segment.style.backgroundColor = langColor(language.name);
-    bar.appendChild(segment);
+  for (const l of top) {
+    const seg = document.createElement('div');
+    seg.title = `${l.name}: ${l.pct.toFixed(1)}%`;
+    seg.style.width = l.pct + '%';
+    seg.style.backgroundColor = langColor(l.name);
+    bar.appendChild(seg);
 
     const item = document.createElement('span');
     const dot = document.createElement('span');
-
     dot.className = 'dot';
-    dot.style.backgroundColor = langColor(language.name);
-
-    item.appendChild(dot);
-    item.appendChild(document.createTextNode(
-      `${language.name} ${language.pct.toFixed(1)}%`
-    ));
-
+    dot.style.backgroundColor = langColor(l.name);
+    item.append(dot, document.createTextNode(`${l.name} ${l.pct.toFixed(1)}%`));
     legend.appendChild(item);
   }
-
-  container.replaceChildren(bar, legend);
+  c.replaceChildren(bar, legend);
 }
 
-/* Build repository cards safely */
 function repoCard(repo) {
   const card = document.createElement('div');
   card.className = 'repo';
-
   const details = document.createElement('div');
-  const titleContainer = document.createElement('div');
-  titleContainer.className = 'repo-title-container';
+  const tc = document.createElement('div');
+  tc.className = 'repo-title-container';
 
   if (repo.archived) {
-    const dot = document.createElement('span');
-    dot.className = 'archive-dot';
-    dot.title = 'Archived';
-    titleContainer.appendChild(dot);
+    const d = document.createElement('span');
+    d.className = 'archive-dot'; d.title = 'Archived';
+    tc.appendChild(d);
   }
-
   const link = document.createElement('a');
-  link.href = repo.html_url;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.title = repo.name;
-  link.textContent = repo.name;
-
-  titleContainer.appendChild(link);
-  details.appendChild(titleContainer);
+  link.href = repo.html_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+  link.title = repo.name; link.textContent = repo.name;
+  tc.appendChild(link);
+  details.appendChild(tc);
 
   if (repo.archived) {
     const badge = document.createElement('span');
-    badge.className = 'archive-badge';
-    badge.textContent = 'Public Archive';
+    badge.className = 'archive-badge'; badge.textContent = 'Public Archive';
     details.appendChild(badge);
   }
 
   const meta = document.createElement('div');
   meta.className = 'meta';
-
   if (repo.language) {
-    const language = document.createElement('span');
-    const dot = document.createElement('span');
-
-    dot.className = 'lang-dot';
-    dot.style.backgroundColor = langColor(repo.language);
-
-    language.appendChild(dot);
-    language.appendChild(document.createTextNode(repo.language));
-    meta.appendChild(language);
+    const l = document.createElement('span');
+    const d = document.createElement('span');
+    d.className = 'lang-dot'; d.style.backgroundColor = langColor(repo.language);
+    l.append(d, document.createTextNode(repo.language));
+    meta.appendChild(l);
   }
-
-  const stars = document.createElement('span');
-  stars.textContent = `★ ${repo.stargazers_count}`;
-  meta.appendChild(stars);
-
-  const updated = document.createElement('span');
-  updated.textContent = new Date(repo.updated_at).toLocaleDateString();
-  meta.appendChild(updated);
+  const stars = document.createElement('span'); stars.textContent = `★ ${repo.stargazers_count}`;
+  const upd = document.createElement('span'); upd.textContent = new Date(repo.updated_at).toLocaleDateString();
+  meta.append(stars, upd);
 
   card.append(details, meta);
-
-  // Make the entire card clickable without blocking its link.
-  card.addEventListener('click', event => {
-    if (event.target.closest('a')) return;
+  card.addEventListener('click', e => {
+    if (e.target.closest('a')) return;
     window.open(repo.html_url, '_blank', 'noopener,noreferrer');
   });
-
   return card;
 }
 
-/* Repository modal */
+/* Repo modal */
 const modal = document.getElementById('modal');
 const openReposBtn = document.getElementById('openReposBtn');
 const closeModalBtn = document.getElementById('closeModal');
-
-function openModal() {
-  modal.classList.add('open');
-  closeModalBtn.focus();
-}
-
-function closeModal() {
-  modal.classList.remove('open');
-  openReposBtn.focus();
-}
-
+const openModal = () => { modal.classList.add('open'); closeModalBtn.focus(); };
+const closeModal = () => { modal.classList.remove('open'); openReposBtn.focus(); };
 openReposBtn.addEventListener('click', openModal);
 closeModalBtn.addEventListener('click', closeModal);
-
-modal.addEventListener('click', event => {
-  if (event.target === modal) closeModal();
-});
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && modal.classList.contains('open')) {
-    closeModal();
-  }
-});
-
-/* Initialize the page */
-updateDiscordStatus();
-setInterval(updateDiscordStatus, 15000);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
 async function initGitHubLayout() {
   const shortList = document.getElementById('reposShort');
   const allList = document.getElementById('reposAll');
-  const langContent = document.getElementById('langContent');
-
   try {
     const repos = await fetchRepos();
-
-    shortList.replaceChildren();
-    allList.replaceChildren();
-
-    if (repos.length === 0) {
-      const message = document.createElement('p');
-      message.className = 'muted';
-      message.textContent = 'No public repositories found.';
-      shortList.appendChild(message);
-
-      const allMessage = message.cloneNode(true);
-      allList.appendChild(allMessage);
+    shortList.replaceChildren(); allList.replaceChildren();
+    if (!repos.length) {
+      shortList.appendChild(note('No public repositories found.'));
+      allList.appendChild(note('No public repositories found.'));
     } else {
-      repos.slice(0, 6).forEach(repo => {
-        shortList.appendChild(repoCard(repo));
-      });
-
-      repos.forEach(repo => {
-        allList.appendChild(repoCard(repo));
-      });
+      repos.slice(0, 6).forEach(r => shortList.appendChild(repoCard(r)));
+      repos.forEach(r => allList.appendChild(repoCard(r)));
     }
-
-    const languages = await fetchLanguages(repos);
-    renderLanguages(languages);
-  } catch (error) {
-    shortList.replaceChildren();
-    allList.replaceChildren();
-
-    const shortMessage = document.createElement('p');
-    shortMessage.className = 'muted';
-    shortMessage.textContent =
-      'Unable to load repositories. Please try again later.';
-    shortList.appendChild(shortMessage);
-
-    const allMessage = shortMessage.cloneNode(true);
-    allList.appendChild(allMessage);
-
-    langContent.replaceChildren();
-
-    const languageMessage = document.createElement('p');
-    languageMessage.className = 'muted';
-    languageMessage.textContent =
-      'Unable to load language statistics.';
-    langContent.appendChild(languageMessage);
-
-    console.error('GitHub loading error:', error);
+    renderLanguages(await fetchLanguages(repos));
+  } catch (err) {
+    shortList.replaceChildren(note('Unable to load repositories. Please try again later.'));
+    allList.replaceChildren(note('Unable to load repositories. Please try again later.'));
+    document.getElementById('langContent').replaceChildren(note('Unable to load language statistics.'));
+    console.error('GitHub loading error:', err);
   }
 }
-
 initGitHubLayout();
-</script>
 
+/* ===== Local accounts (stored in this browser) ===== */
+const DB_KEY = 'mn_users', SESSION_KEY = 'mn_session';
+let user = null;      // { name } when logged in
+let guest = false;
+let currentGame = null;
+
+function loadDB() { try { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; } catch { return {}; } }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+const validName = n => /^[a-z0-9_]{3,20}$/.test(n);
+
+async function hashPass(name, pass) {
+  if (!crypto.subtle) return btoa(unescape(encodeURIComponent(name + ':' + pass)));
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(name + ':' + pass));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function authCore(name, pass, isRegister) {
+  name = name.trim().toLowerCase();
+  if (!validName(name)) return 'Name: 3-20 characters, letters, numbers or _';
+  if (pass.length < 4) return 'Password must be at least 4 characters';
+  const db = loadDB();
+  const h = await hashPass(name, pass);
+  if (isRegister) {
+    if (db[name]) return 'Name already taken';
+    db[name] = { hash: h, saves: {} };
+    saveDB(db);
+  } else if (!db[name] || db[name].hash !== h) {
+    return 'Wrong name or password';
+  }
+  user = { name };
+  guest = false;
+  sessionStorage.setItem(SESSION_KEY, name);
+  return null;
+}
+
+localStorage.removeItem(SESSION_KEY); // clean up old always-logged-in sessions
+/* Leaving the site logs you out: on close/refresh/navigating away (pagehide), and
+   also when a phone restores an old tab (no "heartbeat" for more than 20 seconds). */
+const SEEN_KEY = 'mn_seen';
+const beat = () => { try { sessionStorage.setItem(SEEN_KEY, String(Date.now())); } catch {} };
+const savedSession = sessionStorage.getItem(SESSION_KEY);
+const lastSeen = Number(sessionStorage.getItem(SEEN_KEY)) || 0;
+if (savedSession && Date.now() - lastSeen > 20000) sessionStorage.removeItem(SESSION_KEY);
+else if (savedSession && loadDB()[savedSession]) user = { name: savedSession };
+beat();
+setInterval(beat, 5000);
+
+function leaveSite() {
+  sessionStorage.removeItem(SESSION_KEY);
+  user = null; guest = false;
+}
+window.addEventListener('pagehide', leaveSite);
+window.addEventListener('pageshow', e => {
+  if (!e.persisted) return;
+  leaveSite();
+  if (typeof kosOpen !== 'undefined' && kosOpen) shutdownOS();
+});
+
+/* Games inside KaivoraOS talk to the site with postMessage:
+   parent.postMessage({type:'ready'}) when they start, and
+   parent.postMessage({type:'save', data:{...}}) to save progress. */
+let osGameFrame = null, osCurrentGame = null;
+window.addEventListener('message', e => {
+  if (!osGameFrame || e.source !== osGameFrame.contentWindow || !osCurrentGame) return;
+  const d = e.data || {};
+  if (d.type === 'ready') {
+    const saved = user ? (loadDB()[user.name]?.saves[osCurrentGame.id] ?? null) : null;
+    osGameFrame.contentWindow.postMessage({ type: 'load', data: saved }, '*');
+  }
+  if (d.type === 'save' && user) {
+    const db = loadDB();
+    if (db[user.name]) { db[user.name].saves[osCurrentGame.id] = d.data; saveDB(db); }
+  }
+});
+
+/* ===== KaivoraOS ===== */
+const WALLPAPER = 'wallpaper.png'; // Keep wallpaper.png in the same folder as index.html
+// Cloudflare Worker backend deployed for KaivoraOS.
+const KAIVORA_BACKEND_STATUS_URL = 'https://kaivora-backend.mariostaykovv721.workers.dev/api/status';
+const DEFAULT_TITLE = document.title;
+const kos = document.getElementById('kos');
+const kosBoot = document.getElementById('kosBoot');
+const kosDesktop = document.getElementById('kosDesktop');
+const kosWindows = document.getElementById('kosWindows');
+const kosTasks = document.getElementById('kosTasks');
+const kosMenu = document.getElementById('kosMenu');
+const kosUser = document.getElementById('kosUser');
+const kosClock = document.getElementById('kosClock');
+let kosOpen = false, kosBootTimer = null, kosClockTimer = null, zTop = 1;
+const kosWins = {};
+
+function mk(tag, cls, text) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  if (text != null) el.textContent = text;
+  if (tag === 'button') el.type = 'button';
+  return el;
+}
+
+if (WALLPAPER) {
+  // Use the local wallpaper file and keep a dark fallback if it cannot load.
+  kosDesktop.style.backgroundImage = `url("${WALLPAPER}")`;
+  kosDesktop.style.backgroundPosition = 'center';
+  kosDesktop.style.backgroundSize = 'cover';
+  kosDesktop.style.backgroundRepeat = 'no-repeat';
+  const im = new Image();
+  im.onerror = () => { kosDesktop.style.backgroundImage = 'radial-gradient(900px 600px at 12% 110%,rgba(229,72,77,.30),transparent 62%),radial-gradient(800px 500px at 95% -10%,rgba(255,255,255,.08),transparent 60%)'; };
+  im.src = WALLPAPER;
+}
+
+/* --- tab name + icon (saved in this browser, applied on every page load) --- */
+const TAB_KEY = 'kos_tab';
+function loadTab() { try { return JSON.parse(localStorage.getItem(TAB_KEY)) || {}; } catch { return {}; } }
+function saveTab(t) { try { localStorage.setItem(TAB_KEY, JSON.stringify(t)); } catch {} }
+function setFavicon(href) {
+  document.querySelectorAll('link[rel~="icon"]').forEach(l => l.remove());
+  if (!href) return;
+  const l = document.createElement('link');
+  l.rel = 'icon'; l.href = href;
+  document.head.appendChild(l);
+}
+function emojiIcon(ch) {
+  const c = ch.replace(/[<>&"']/g, '');
+  return 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">' + c + '</text></svg>');
+}
+function fileToIcon(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = rej;
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 64;
+        const side = Math.min(img.width, img.height);
+        c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 64, 64);
+        res(c.toDataURL('image/png'));
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+function applyTab() {
+  const t = loadTab();
+  document.title = t.title || DEFAULT_TITLE;
+  setFavicon(t.icon || '');
+}
+applyTab();
+
+/* --- play time per account (guests are not tracked) --- */
+const STATS_KEY = 'kos_stats';
+function allStats() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch { return {}; } }
+function getStat(id) { return (user && (allStats()[user.name] || {})[id]) || { ms: 0, last: 0 }; }
+function addPlay(id, ms) {
+  if (!user) return;
+  const a = allStats();
+  const u = a[user.name] = a[user.name] || {};
+  const st = u[id] = u[id] || { ms: 0, last: 0 };
+  st.ms += ms; st.last = Date.now();
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(a)); } catch {}
+}
+function fmtTime(ms) {
+  const m = Math.round(ms / 60000);
+  return m < 1 ? (ms ? '< 1 min' : '0 min') : m < 60 ? m + ' min' : (m / 60).toFixed(1) + ' h';
+}
+
+/* --- Games app: a library like Steam's, with our own games --- */
+function buildGames(body) {
+  const lib = mk('div', 'lib');
+  const side = mk('div', 'lib-side');
+  const search = mk('input', 'lib-search');
+  search.placeholder = 'Search games';
+  search.setAttribute('aria-label', 'Search games');
+  const label = mk('div', 'lib-label');
+  const list = mk('div', 'lib-list');
+  const main = mk('div', 'lib-main');
+  side.append(search, label, list);
+  lib.append(side, main);
+  body.append(lib);
+
+  let selected = GAMES[0] || null, playing = null, startedAt = 0;
+  const hue = name => { let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+
+  function renderList() {
+    list.replaceChildren();
+    const q = search.value.trim().toLowerCase();
+    const shown = GAMES.filter(g => g.name.toLowerCase().includes(q));
+    label.textContent = 'ALL GAMES (' + shown.length + ')';
+    if (!shown.length) { list.appendChild(note('No games found.')); return; }
+    for (const g of shown) {
+      const b = mk('button', 'lib-item' + (g === selected ? ' sel' : ''));
+      const tile = mk('span', 'lib-tile', g.name.charAt(0).toUpperCase());
+      tile.style.background = 'hsl(' + hue(g.name) + ' 40% 28%)';
+      b.append(tile, document.createTextNode(g.name));
+      b.onclick = () => { if (playing) stop(); selected = g; renderList(); renderMain(); };
+      list.appendChild(b);
+    }
+  }
+
+  function renderMain() {
+    main.replaceChildren();
+    if (!selected) { main.appendChild(note('No games yet. Add some to the GAMES list in index.html.')); return; }
+    const g = selected, st = getStat(g.id);
+    const hero = mk('div', 'lib-hero', g.name);
+    hero.style.background = g.cover
+      ? "url('" + g.cover + "') center/cover"
+      : 'linear-gradient(135deg,hsl(' + hue(g.name) + ' 45% 26%),hsl(' + hue(g.name) + ' 40% 8%))';
+    const bar = mk('div', 'lib-bar');
+    const play = mk('button', 'lib-play', '▶ PLAY');
+    play.onclick = start;
+    const stat = (k, v) => { const d = mk('div', 'lib-stat', k); d.appendChild(mk('b', '', v)); return d; };
+    const saved = user ? (loadDB()[user.name]?.saves[g.id] ? 'Saved' : 'No save yet') : 'Guest (not saved)';
+    bar.append(play,
+      stat('LAST PLAYED', st.last ? new Date(st.last).toLocaleDateString() : 'Never'),
+      stat('PLAY TIME', fmtTime(st.ms)),
+      stat('PROGRESS', saved));
+    main.append(hero, bar, mk('div', 'lib-desc', g.desc || 'No description yet.'));
+  }
+
+  function start() {
+    playing = selected; startedAt = Date.now(); osCurrentGame = selected;
+    main.replaceChildren();
+    const bar = mk('div', 'lib-bar');
+    const stopBtn = mk('button', 'repos-btn', '■ Stop');
+    stopBtn.onclick = stop;
+    const frame = document.createElement('iframe');
+    frame.title = selected.name;
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-pointer-lock');
+    frame.src = selected.file;
+    osGameFrame = frame;
+    const full = mk('button', 'repos-btn', 'Fullscreen');
+    full.onclick = () => { if (frame.requestFullscreen) frame.requestFullscreen(); };
+    bar.append(mk('span', 'lib-gname', selected.name), full, stopBtn);
+    const area = mk('div', 'lib-area');
+    area.append(bar, frame);
+    main.append(area);
+  }
+
+  function finish() {
+    if (!playing) return;
+    addPlay(playing.id, Date.now() - startedAt);
+    playing = null; osGameFrame = null; osCurrentGame = null;
+  }
+  function stop() { finish(); renderMain(); }
+
+  search.addEventListener('input', renderList);
+  renderList(); renderMain();
+  return finish; // runs when the window is closed
+}
+
+/* --- Settings app: tab name and icon --- */
+function buildSettings(body) {
+  const t = loadTab();
+  const wrap = mk('div', 'kos-settings');
+  const field = (labelText, el) => { const l = mk('label', '', labelText); wrap.append(l, el); };
+
+  wrap.append(mk('h4', '', 'Browser tab'));
+  const nameIn = mk('input', 'kos-field');
+  nameIn.placeholder = DEFAULT_TITLE; nameIn.value = t.title || ''; nameIn.maxLength = 60;
+  field('Tab name', nameIn);
+
+  const emojiIn = mk('input', 'kos-field');
+  emojiIn.placeholder = 'e.g. 🎮'; emojiIn.maxLength = 4;
+  field('Tab icon: an emoji', emojiIn);
+
+  const fileIn = document.createElement('input');
+  fileIn.type = 'file'; fileIn.accept = 'image/*';
+  field('...or upload an image (used instead of the emoji)', fileIn);
+
+  const prev = mk('div', 'kos-prev');
+  const prevImg = document.createElement('img');
+  prevImg.alt = '';
+  const prevTitle = mk('span', '');
+  prev.append(prevImg, prevTitle);
+  wrap.append(prev);
+  function showPreview() {
+    const cur = loadTab();
+    prevImg.hidden = !cur.icon;
+    if (cur.icon) prevImg.src = cur.icon;
+    prevTitle.textContent = cur.title || DEFAULT_TITLE;
+  }
+
+  const msg = mk('p', 'muted', '');
+  const row = mk('div', 'kos-row');
+  const apply = mk('button', 'repos-btn', 'Apply');
+  const reset = mk('button', 'repos-btn', 'Reset');
+  row.append(apply, reset);
+  wrap.append(row, msg);
+
+  apply.onclick = async () => {
+    const nt = loadTab();
+    nt.title = nameIn.value.trim();
+    try {
+      if (fileIn.files[0]) nt.icon = await fileToIcon(fileIn.files[0]);
+      else {
+        const em = [...emojiIn.value.trim()].slice(0, 3).join('');
+        if (em) nt.icon = emojiIcon(em);
+      }
+    } catch { msg.textContent = 'Could not read that image.'; return; }
+    saveTab(nt); applyTab(); showPreview();
+    msg.textContent = 'Saved. Your tab now shows this.';
+  };
+  reset.onclick = () => {
+    try { localStorage.removeItem(TAB_KEY); } catch {}
+    nameIn.value = ''; emojiIn.value = ''; fileIn.value = '';
+    applyTab(); showPreview();
+    msg.textContent = 'Back to the default tab name and icon.';
+  };
+
+  wrap.append(mk('h4', '', 'Account'));
+  wrap.append(mk('p', 'muted', user ? 'Signed in as ' + user.name : 'Guest (progress is not saved)'));
+  const out = mk('button', 'repos-btn', 'Log out');
+  out.onclick = kosLogout;
+  wrap.append(out);
+
+  showPreview();
+  body.append(wrap);
+}
+
+
+/* --- Kalu browser: DuckDuckGo search with pinned bookmarks --- */
+function buildKalu(body) {
+  const root = mk('div', 'kalu-browser');
+  const toolbar = mk('div', 'kalu-toolbar');
+  const brand = mk('div', 'kalu-brand');
+  brand.append(appMark('kalu'), mk('span', '', 'kalu'));
+  const back = mk('button', 'kalu-btn', '←'); back.title = 'Back';
+  const forward = mk('button', 'kalu-btn', '→'); forward.title = 'Forward';
+  const reload = mk('button', 'kalu-btn', '↻'); reload.title = 'Reload';
+  const address = mk('input', 'kalu-address');
+  address.value = 'https://html.duckduckgo.com/html/';
+  address.setAttribute('aria-label', 'Search DuckDuckGo or enter a web address');
+  address.placeholder = 'Search DuckDuckGo or enter a website';
+  const go = mk('button', 'kalu-btn', 'Go');
+  const external = mk('button', 'kalu-btn', 'Open site ↗');
+  toolbar.append(brand, back, forward, reload, address, go, external);
+
+  const bookmarks = mk('div', 'kalu-bookmarks');
+  const sites = [
+    { name: 'YouTube', url: 'https://www.youtube.com/', letter: '▶', color: '#e62117' },
+    { name: 'Discord', url: 'https://discord.com/app', letter: 'D', color: '#5865f2' },
+    { name: 'Spotify', url: 'https://open.spotify.com/', letter: 'S', color: '#16883e' },
+    { name: 'TikTok', url: 'https://www.tiktok.com/', letter: '♪', color: '#15171b' }
+  ];
+  const view = mk(window.kosRuntime?.electron ? 'webview' : 'iframe', 'kalu-view');
+  view.title = 'Kalu browser page';
+  if (view.tagName.toLowerCase() === 'iframe') view.referrerPolicy = 'strict-origin-when-cross-origin';
+  if (view.tagName.toLowerCase() === 'webview') {
+    view.setAttribute('allowpopups', '');
+    view.setAttribute('partition', 'persist:kalu');
+  }
+  view.src = 'https://html.duckduckgo.com/html/';
+  const home = mk('div', 'kalu-home');
+  const heading = document.createElement('h2'); heading.innerHTML = 'Search with <span>DuckDuckGo</span>';
+  const subtitle = mk('p', '', 'Search privately from Kalu. Your bookmarks are ready below.');
+  const form = mk('form', 'kalu-searchform');
+  const query = mk('input'); query.placeholder = 'Search the web with DuckDuckGo…'; query.setAttribute('aria-label', 'DuckDuckGo search');
+  const searchBtn = mk('button', 'kalu-btn', 'Search'); searchBtn.type = 'submit'; searchBtn.style.background = '#282724'; searchBtn.style.color = '#f1eee6'; searchBtn.style.borderColor = '#282724';
+  form.append(query, searchBtn); home.append(heading, subtitle, form);
+  const status = mk('div', 'kalu-status');
+  const statusMessage = mk('span', '', 'Kalu · Enter a URL or search term. Some sites restrict embedding; use Open site ↗ when needed.');
+  const backendStatus = mk('span', 'kalu-backend-status', 'Backend: checking');
+  backendStatus.title = 'Connection to the KaivoraOS backend';
+  status.append(statusMessage, backendStatus);
+  root.append(toolbar, bookmarks, home, view, status); body.append(root);
+
+  // This confirms the frontend can reach the Worker. It is a status API,
+  // not a website proxy, so it cannot override sites that block iframe embeds.
+  async function checkBackend() {
+    backendStatus.classList.remove('online', 'offline');
+    backendStatus.textContent = 'Backend: checking';
+    try {
+      const response = await fetch(KAIVORA_BACKEND_STATUS_URL, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const data = await response.json();
+      if (data.status !== 'online' || data.name !== 'KaivoraOS') throw new Error('Unexpected response');
+      backendStatus.classList.add('online');
+      backendStatus.textContent = 'Backend: online';
+      backendStatus.title = 'Connected to KaivoraOS backend v' + (data.version || 'unknown');
+    } catch (error) {
+      backendStatus.classList.add('offline');
+      backendStatus.textContent = 'Backend: offline';
+      backendStatus.title = 'Could not reach the Worker. Check the Worker URL and CORS settings.';
+      console.warn('KaivoraOS backend connection failed:', error);
+    }
+  }
+  checkBackend();
+  view.hidden = true;
+  if (view.tagName.toLowerCase() === 'webview') {
+    view.addEventListener('did-start-loading', () => { statusMessage.textContent = 'Loading inside Kalu…'; });
+    view.addEventListener('did-finish-load', () => { statusMessage.textContent = 'Loaded inside Kalu'; });
+    view.addEventListener('did-fail-load', e => { if (e.errorCode !== -3) statusMessage.textContent = 'Could not load this page (' + e.errorCode + '). The site or network may be blocking access.'; });
+    view.addEventListener('new-window', e => { if (e.url && /^https?:/i.test(e.url)) navigate(e.url); });
+  }
+  let history = [], historyIndex = -1, currentUrl = 'https://html.duckduckgo.com/html/';
+
+  function normalize(raw) {
+    const value = String(raw || '').trim();
+    if (!value) return 'https://html.duckduckgo.com/html/';
+    // Never allow script or local-file schemes to be navigated to from the address bar.
+    if (/^(javascript|data|file|vbscript):/i.test(value)) return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value);
+    if (/^https?:\/\//i.test(value)) {
+      try { const parsed = new URL(value); return ['http:','https:'].includes(parsed.protocol) ? parsed.href : 'https://duckduckgo.com/?q=' + encodeURIComponent(value); }
+      catch { return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value); }
+    }
+    // Accept domains, localhost, IPv4 addresses, ports, and paths without requiring a scheme.
+    const looksLikeHost = !/\s/.test(value) && (/^(localhost|\d{1,3}(?:\.\d{1,3}){3})(:\d{1,5})?(\/.*)?$/i.test(value) || /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(?::\d{1,5})?(?:\/[^\s]*)?$/i.test(value));
+    if (looksLikeHost) return 'https://' + value;
+    return 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(value);
+  }
+  function navigate(raw, push=true) {
+    const url = normalize(raw); currentUrl = url; address.value = url;
+    home.hidden = true; view.hidden = false; view.src = url;
+    statusMessage.textContent = 'Loading inside Kalu: ' + url + ' · If it stays blank, that site may block iframe embedding.';
+    if (push) { history = history.slice(0, historyIndex + 1); history.push(url); historyIndex = history.length - 1; }
+    back.disabled = historyIndex <= 0;
+    forward.disabled = historyIndex >= history.length - 1;
+  }
+  function openExternal(url=currentUrl) {
+    const safe = normalize(url);
+    if (!/^https?:\/\//i.test(safe)) return;
+    // Open directly from the user's click so browsers do not treat it as an unsolicited popup.
+    const tab = window.open(safe, '_blank', 'noopener,noreferrer');
+    if (!tab) statusMessage.textContent = 'Your browser blocked the new tab. Allow pop-ups for this page, then try again.';
+    else statusMessage.textContent = 'Opened in a new tab: ' + safe;
+  }
+  go.onclick = () => navigate(address.value);
+  address.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); navigate(address.value); } });
+  form.addEventListener('submit', e => { e.preventDefault(); if (query.value.trim()) navigate('https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query.value.trim())); });
+  external.onclick = () => openExternal();
+  back.onclick = () => { if (historyIndex > 0) { historyIndex--; navigate(history[historyIndex], false); } };
+  forward.onclick = () => { if (historyIndex < history.length - 1) { historyIndex++; navigate(history[historyIndex], false); } };
+  reload.onclick = () => { if (view.hidden) { view.hidden = false; home.hidden = true; } view.src = currentUrl; };
+  for (const site of sites) {
+    const b = mk('button', 'kalu-bookmark');
+    const icon = mk('span', 'kalu-siteicon', site.letter); icon.style.background = site.color;
+    b.append(icon, document.createTextNode(site.name));
+    b.title = 'Open ' + site.name;
+    b.onclick = () => { address.value = site.url; navigate(site.url); };
+    bookmarks.appendChild(b);
+  }
+  // Make DuckDuckGo the browser's initial page while retaining a local home view.
+  address.addEventListener('focus', () => {});
+  return null;
+}
+
+const APP_SVGS = {
+  games: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10a4 4 0 0 1 3.8 5.2l-1 3.1a2 2 0 0 1-3.3.8L14 14H10l-2.5 3.1a2 2 0 0 1-3.3-.8l-1-3.1A4 4 0 0 1 7 8Z"/><path d="M7 10v4M5 12h4M16.5 11.5h.01M18.5 13.5h.01"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.1a3.9 3.9 0 1 0 0 7.8 3.9 3.9 0 0 0 0-7.8Z"/><path d="m19.4 13.5 1.1.9-1.2 2.1-1.4-.5a7.9 7.9 0 0 1-1.6.9l-.2 1.5h-2.4l-.3-1.5a7.9 7.9 0 0 1-1.6-.9l-1.4.5-1.2-2.1 1.1-.9a7.5 7.5 0 0 1 0-1.8l-1.1-.9 1.2-2.1 1.4.5a7.9 7.9 0 0 1 1.6-.9l.3-1.5h2.4l.2 1.5a7.9 7.9 0 0 1 1.6.9l1.4-.5 1.2 2.1-1.1.9a7.5 7.5 0 0 1 0 1.8Z"/></svg>',
+  kalu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>'
+};
+function appMark(id) {
+  const mark = mk('span', 'kos-appmark ' + id);
+  mark.setAttribute('aria-hidden', 'true');
+  mark.innerHTML = APP_SVGS[id] || APP_SVGS.kalu;
+  return mark;
+}
+const APPS = {
+  games:    { title: 'Games',    icon: 'games', w: 900, h: 560, build: buildGames },
+  kalu:     { title: 'Kalu',     icon: 'kalu', w: 1000, h: 680, build: buildKalu },
+  settings: { title: 'Settings', icon: 'settings', w: 460, h: 560, build: buildSettings }
+};
+
+/* --- windows --- */
+function focusWin(id) {
+  const w = kosWins[id];
+  if (!w) return;
+  w.el.style.zIndex = ++zTop;
+  for (const [k, v] of Object.entries(kosWins)) v.task.classList.toggle('active', k === id);
+}
+function closeWin(id) {
+  const w = kosWins[id];
+  if (!w) return;
+  if (w.onClose) w.onClose();
+  w.el.remove(); w.task.remove();
+  delete kosWins[id];
+}
+function openApp(id) {
+  kosMenu.hidden = true;
+  if (kosWins[id]) { focusWin(id); return; }
+  const app = APPS[id];
+  const n = Object.keys(kosWins).length;
+  const el = mk('div', 'kos-win');
+  const w = Math.min(app.w, innerWidth - 16), h = Math.min(app.h, innerHeight - 70);
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.style.left = Math.max(8, (innerWidth - w) / 2 + n * 26) + 'px';
+  el.style.top = Math.max(8, (innerHeight - 44 - h) / 2 + n * 26) + 'px';
+  if (innerWidth < 700) el.classList.add('max');
+
+  const bar = mk('div', 'kos-wbar');
+  const maxBtn = mk('button', '', '▢'); maxBtn.title = 'Maximize';
+  const closeBtn = mk('button', '', '×'); closeBtn.title = 'Close';
+  const winTitle = mk('span', 'kos-wtitle'); winTitle.append(appMark(app.icon), document.createTextNode(' ' + app.title));
+  winTitle.style.display = 'flex'; winTitle.style.alignItems = 'center'; winTitle.style.gap = '8px';
+  bar.append(winTitle, maxBtn, closeBtn);
+  const body = mk('div', 'kos-wbody');
+  el.append(bar, body);
+  kosWindows.appendChild(el);
+
+  const task = mk('button', 'kos-task');
+  task.append(appMark(app.icon), document.createTextNode(' ' + app.title));
+  task.onclick = () => focusWin(id);
+  kosTasks.appendChild(task);
+  kosWins[id] = { el, task, onClose: null };
+  kosWins[id].onClose = app.build(body) || null;
+
+  maxBtn.onclick = () => el.classList.toggle('max');
+  closeBtn.onclick = () => closeWin(id);
+  el.addEventListener('pointerdown', () => focusWin(id));
+
+  let d = null;
+  bar.addEventListener('pointerdown', e => {
+    if (e.target.closest('button') || el.classList.contains('max')) return;
+    const r = el.getBoundingClientRect();
+    d = { dx: e.clientX - r.left, dy: e.clientY - r.top, lastX: e.clientX, lastY: e.clientY, lastT: performance.now(), vx: 0, vy: 0, angle: 0 };
+    el.classList.remove('kos-wiggle-release');
+    el.classList.add('wiggling');
+    el.style.setProperty('--release-angle', '0deg');
+    el.style.transition = 'none';
+    bar.setPointerCapture(e.pointerId);
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!d) return;
+    const now = performance.now();
+    const dt = Math.max(1, now - d.lastT);
+    const dx = e.clientX - d.lastX;
+    const dy = e.clientY - d.lastY;
+    // Smoothed pointer velocity gives the elastic, physics-driven Linux-style wobble.
+    d.vx = d.vx * 0.42 + (dx / dt) * 0.58;
+    d.vy = d.vy * 0.42 + (dy / dt) * 0.58;
+    d.lastX = e.clientX; d.lastY = e.clientY; d.lastT = now;
+    d.angle = Math.max(-8, Math.min(8, d.vx * 2.6));
+    const lean = Math.max(-3, Math.min(3, d.vy * 0.6));
+    el.style.transform = `perspective(900px) rotate(${d.angle}deg) skewY(${lean}deg) scale(1.012, .992)`;
+    el.style.left = Math.min(Math.max(0, e.clientX - d.dx), kosWindows.clientWidth - 80) + 'px';
+    el.style.top = Math.min(Math.max(0, e.clientY - d.dy), kosWindows.clientHeight - 36) + 'px';
+  });
+  function endWindowDrag() {
+    if (!d) return;
+    const angle = d.angle || 0;
+    d = null;
+    el.style.setProperty('--release-angle', angle + 'deg');
+    el.style.transition = '';
+    el.style.transform = '';
+    el.classList.remove('wiggling');
+    el.classList.add('kos-wiggle-release');
+    window.setTimeout(() => { el.classList.remove('kos-wiggle-release'); el.style.removeProperty('--release-angle'); }, 520);
+  }
+  bar.addEventListener('pointerup', endWindowDrag);
+  bar.addEventListener('pointercancel', endWindowDrag);
+  focusWin(id);
+}
+
+/* --- desktop icons, start menu, boot and shut down --- */
+function menuItem(text, fn) {
+  const b = mk('button', 'kos-mi', text);
+  b.onclick = () => { kosMenu.hidden = true; fn(); };
+  kosMenu.appendChild(b);
+}
+for (const [id, app] of Object.entries(APPS)) {
+  const ic = mk('button', 'kos-icon');
+  ic.append(appMark(app.icon), document.createTextNode(app.title));
+  ic.onclick = () => openApp(id);
+  document.getElementById('kosIcons').appendChild(ic);
+  const mi = mk('button', 'kos-mi'); mi.append(appMark(app.icon), document.createTextNode('  ' + app.title)); mi.style.display = 'flex'; mi.style.alignItems = 'center'; mi.style.gap = '10px'; mi.onclick = () => { kosMenu.hidden = true; openApp(id); }; kosMenu.appendChild(mi);
+}
+kosMenu.appendChild(mk('div', 'kos-sep'));
+menuItem('Log out', () => kosLogout());
+menuItem('Shut down', () => shutdownOS());
+
+document.getElementById('kosStart').onclick = () => { kosMenu.hidden = !kosMenu.hidden; };
+kosDesktop.addEventListener('pointerdown', e => {
+  if (!e.target.closest('#kosMenu, #kosStart')) kosMenu.hidden = true;
+});
+
+function tickClock() {
+  kosClock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function bootOS() {
+  hideTerm();
+  clearTimeout(kosBootTimer); clearInterval(kosClockTimer);
+  kos.hidden = false; kosOpen = true;
+  document.body.style.overflow = 'hidden';
+  kosBoot.hidden = false; kosDesktop.hidden = true; kosMenu.hidden = true;
+  const bar = kosBoot.querySelector('.kos-bar i');
+  bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
+  kosBootTimer = setTimeout(() => {
+    kosBoot.hidden = true; kosDesktop.hidden = false;
+    kosUser.textContent = user ? user.name : 'guest';
+    tickClock();
+    kosClockTimer = setInterval(tickClock, 15000);
+  }, 1700);
+}
+
+function shutdownOS() {
+  clearTimeout(kosBootTimer); clearInterval(kosClockTimer);
+  Object.keys(kosWins).forEach(id => closeWin(id));
+  kosMenu.hidden = true; kos.hidden = true; kosOpen = false;
+  document.body.style.overflow = '';
+}
+
+function kosLogout() {
+  user = null; guest = false;
+  sessionStorage.removeItem(SESSION_KEY);
+  shutdownOS();
+}
+
+/* ===== Secret terminal window (press `) ===== */
+const term = document.getElementById('term');
+const termBar = document.getElementById('termBar');
+const termBody = document.getElementById('termBody');
+const termOut = document.getElementById('termOut');
+const termIn = document.getElementById('termIn');
+const termPrompt = document.getElementById('termPrompt');
+const termTitle = document.getElementById('termTitle');
+let termPlaced = false;
+
+function print(text) {
+  const p = document.createElement('div');
+  p.textContent = text;
+  termOut.appendChild(p);
+  termBody.scrollTop = termBody.scrollHeight;
+}
+
+// a typed command keeps its coloured prompt in the history
+function printCmd(line) {
+  const p = document.createElement('div');
+  const ps = document.createElement('span');
+  ps.className = 'ps';
+  ps.textContent = termPrompt.textContent + ' ';
+  p.append(ps, document.createTextNode(line));
+  termOut.appendChild(p);
+  termBody.scrollTop = termBody.scrollHeight;
+}
+
+function updatePrompt() {
+  const who = user ? user.name : 'guest';
+  termPrompt.textContent = who + '@net:~$';
+  termTitle.textContent = who + '@net: ~';
+}
+
+const termAuthBox = document.getElementById('termAuth');
+const tAuthName = document.getElementById('tAuthName');
+const tAuthPass = document.getElementById('tAuthPass');
+const tAuthMsg = document.getElementById('tAuthMsg');
+
+// The console is locked until they log in, register or pick guest above it.
+function refreshTermLock() {
+  const locked = !user && !guest;
+  termAuthBox.hidden = !locked;
+  termIn.disabled = locked;
+  termIn.placeholder = locked ? 'locked: log in first' : '';
+  term.classList.toggle('locked', locked);
+  updatePrompt();
+}
+
+async function termSignIn(isRegister) {
+  const err = await authCore(tAuthName.value, tAuthPass.value, isRegister);
+  if (err) { tAuthMsg.textContent = err; return; }
+  tAuthName.value = ''; tAuthPass.value = ''; tAuthMsg.textContent = '';
+  refreshTermLock();
+  print((isRegister ? 'account created. ' : '') + 'logged in as ' + user.name + '. type help for commands');
+  termIn.focus();
+}
+
+function showTerm() {
+  term.hidden = false;
+  if (!termPlaced) {
+    term.style.left = Math.max(8, (innerWidth - term.offsetWidth) / 2) + 'px';
+    term.style.top = Math.max(8, innerHeight * 0.15) + 'px';
+    termPlaced = true;
+  }
+  refreshTermLock();
+  if (!termIn.disabled && !termOut.children.length) print('type help for commands');
+  (termIn.disabled ? tAuthName : termIn).focus();
+  // The shortcut handler prevents the backtick from being typed. Do not clear
+  // the username or terminal input here; preserve whatever the user entered.
+}
+function hideTerm() { term.hidden = true; }
+const toggleTerm = () => (term.hidden ? showTerm() : hideTerm());
+
+document.getElementById('termClose').onclick = hideTerm;
+document.getElementById('tLoginBtn').onclick = () => termSignIn(false);
+document.getElementById('tRegisterBtn').onclick = () => termSignIn(true);
+document.getElementById('tGuestBtn').onclick = () => {
+  guest = true;
+  refreshTermLock();
+  print('continuing as guest (progress is not saved). type help for commands');
+  termIn.focus();
+};
+tAuthPass.addEventListener('keydown', e => { if (e.key === 'Enter') termSignIn(false); });
+// Only remove the literal backtick character. Preserve every other username character.
+const cleanName = () => { tAuthName.value = tAuthName.value.replace(/`/g, ''); };
+tAuthName.addEventListener('beforeinput', e => {
+  if (typeof e.data === 'string' && e.data.includes('`')) e.preventDefault();
+});
+tAuthName.addEventListener('input', e => { if (!e.isComposing) cleanName(); });
+tAuthName.addEventListener('compositionend', cleanName);
+termBody.addEventListener('click', () => { if (!String(getSelection())) termIn.focus(); });
+
+// never allow backtick-type characters inside the terminal input
+termIn.addEventListener('beforeinput', e => {
+  if (termIn.type === 'text' && typeof e.data === 'string' && e.data.includes('`')) e.preventDefault();
+});
+termIn.addEventListener('input', () => {
+  if (termIn.type === 'text') termIn.value = termIn.value.replace(/`/g, '');
+});
+
+/* Drag the window by its title bar */
+let drag = null;
+termBar.addEventListener('pointerdown', e => {
+  if (e.target.closest('button')) return;
+  const r = term.getBoundingClientRect();
+  drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+  termBar.setPointerCapture(e.pointerId);
+});
+termBar.addEventListener('pointermove', e => {
+  if (!drag) return;
+  term.style.left = Math.min(Math.max(0, e.clientX - drag.dx), innerWidth - 80) + 'px';
+  term.style.top = Math.min(Math.max(0, e.clientY - drag.dy), innerHeight - 40) + 'px';
+});
+const endDrag = () => { drag = null; };
+termBar.addEventListener('pointerup', endDrag);
+termBar.addEventListener('pointercancel', endDrag);
+
+/* Open the terminal with the physical backtick key (or F2).
+   Do not treat ordinary letters from other keyboard layouts as the shortcut. */
+const isTermKey = e => e.code === 'Backquote' || e.keyCode === 192 || e.key === 'F2';
+
+window.addEventListener('keydown', e => {
+  if (kosOpen) {
+    if (e.key === 'Escape') kosMenu.hidden = true;
+    return;
+  }
+
+  if (isTermKey(e)) {
+    const t = e.target;
+    if (t instanceof HTMLElement && t.closest('[contenteditable="true"]')) return;
+    if (t instanceof HTMLInputElement && ![termIn, tAuthName, tAuthPass].includes(t)) return;
+
+    // Always consume the shortcut so it cannot edit the focused input.
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    // If the terminal is already open and its login/command field is focused,
+    // ignore the shortcut instead of closing the window and disrupting typing.
+    if (!term.hidden && [termIn, tAuthName, tAuthPass].includes(t)) return;
+    toggleTerm();
+    return;
+  }
+
+  if (e.key === 'Escape') {
+    if (!term.hidden) hideTerm();
+    else if (modal.classList.contains('open')) closeModal();
+  }
+}, true);
+
+/* Fallback: click the profile picture 5 times (also works on phones) */
+let pfpClicks = 0, pfpTimer;
+document.querySelector('.pfp').addEventListener('click', () => {
+  clearTimeout(pfpTimer);
+  pfpTimer = setTimeout(() => { pfpClicks = 0; }, 2000);
+  if (++pfpClicks >= 5) { pfpClicks = 0; toggleTerm(); }
+});
+
+/* ===== whoami helpers ===== */
+function deviceInfo() {
+  const ua = navigator.userAgent;
+  let os = 'unknown OS';
+  if (/CrOS/.test(ua)) os = 'ChromeOS';
+  else if (/Windows/.test(ua)) os = 'Windows';
+  else if (/Android/.test(ua)) os = 'Android';
+  else if (/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+  else if (/Mac OS X|Macintosh/.test(ua)) os = 'macOS';
+  else if (/Linux/.test(ua)) os = 'Linux';
+
+  let browser = 'unknown browser';
+  if (/Edg\//.test(ua)) browser = 'Edge';
+  else if (/OPR\/|Opera/.test(ua)) browser = 'Opera';
+  else if (/Firefox\//.test(ua)) browser = 'Firefox';
+  else if (/Chrome\//.test(ua)) browser = 'Chrome';
+  else if (/Safari\//.test(ua)) browser = 'Safari';
+
+  const tablet = /iPad|Tablet/.test(ua) || (/Android/.test(ua) && !/Mobile/.test(ua));
+  const phone = !tablet && /Mobi|iPhone|Android/.test(ua);
+  return os + ' ' + (tablet ? 'tablet' : phone ? 'phone' : 'computer') + ', ' + browser;
+}
+
+async function getJSON(url) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 5000);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+
+// The lookup runs in the visitor's own browser and the result is only
+// printed in their terminal. Nothing is stored or sent to this site.
+async function lookupIP() {
+  try {
+    const d = await getJSON('https://ipwho.is/');
+    if (d && d.success !== false && d.ip) return { ip: d.ip, country: d.country || null };
+  } catch {}
+  try {
+    const d = await getJSON('https://api.ipify.org?format=json');
+    if (d && d.ip) return { ip: d.ip, country: null };
+  } catch {}
+  return { ip: null, country: null };
+}
+
+/* ===== Shell ===== */
+termIn.addEventListener('keydown', async e => {
+  if (e.key !== 'Enter') return;
+  const line = termIn.value.trim();
+  termIn.value = '';
+  if (!line) return;
+  printCmd(line);
+  await runCommand(line);
+});
+
+async function runCommand(line) {
+  const cmd = line.toLowerCase();
+
+  if (cmd === SECRET_CODE) { bootOS(); return; }
+
+  if (cmd === 'help') { print('commands: help, whoami'); return; }
+
+  if (cmd === 'whoami') {
+    print('youare "' + (user ? user.name : 'guest') + '"');
+    const info = await lookupIP();
+    print('ip address: ' + (info.ip || 'unavailable'));
+    print('device: ' + deviceInfo());
+    print('country: ' + (info.country || 'unavailable'));
+    return;
+  }
+
+  print(cmd.split(/\s+/)[0] + ': command not found');
+}
+</script>
 </body>
 </html>
